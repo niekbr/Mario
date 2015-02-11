@@ -13,10 +13,12 @@ Thomas W. & Niek B.
 - Uitvinden hoe synchronisatie het beste kan (GitHub)
 - Bewegende achtergrond
 - GitHub sync lukt nu!
+
 ## 6-2
 - Botsen I & II & III
 - Snelheid & Versnellen
 - **FOUT IN VERSNELLEN!** Zie ingeleverd bestand of de hele game hierboven
+
 ## 5-2
 - Thomas afwezig
 - Nieuwe klasses gemaakt
@@ -29,6 +31,7 @@ Thomas W. & Niek B.
 - Object bewegen I & II & III
 - De eerste 2 Goomba’s kunnen nu bewegen (als test), met ASDW, en pijltjestoetsen)
 - Alle enemies kunnen versleept worden (als test)
+
 ## 4-2
 - Rolverdeling gemaakt
 - Ontwerp gemaakt
