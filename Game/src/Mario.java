@@ -3,7 +3,8 @@ import java.awt.image.BufferedImage;
 
 public class Mario {
 	public BufferedImage img;		// Een plaatje van de Enemy (in child gedefineerd)
-	public int x,y, breedte, hoogte, xOld, yOld, vx, vy;	// De plaats en afmeting van de Enemy in px (in child gedefineerd)
+	public int x, y, breedte, hoogte, xOld, yOld, vy = 1, spring;	// De plaats en afmeting van de Enemy in px (in child gedefineerd)
+	
 	
 	public Mario(BufferedImage image, int xBegin, int yBegin,int b, int h){
 		this.img = image;
@@ -14,7 +15,9 @@ public class Mario {
 		
 	}
 	
-	public void lopen() {
+	public void spring() {
+		this.spring = this.y;
+		this.vy = -1;
 	}
 	
 	public void teken(Graphics2D tekenObject){

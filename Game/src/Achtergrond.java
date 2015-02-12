@@ -3,7 +3,7 @@ import java.awt.image.BufferedImage;
 
 
 public class Achtergrond {
-	public int x, y, breedte, hoogte, vx;
+	public int x, y, breedte, hoogte;
 	public BufferedImage img;
 	
 	public Achtergrond(BufferedImage image, int x, int y, int b, int h) {

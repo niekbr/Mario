@@ -12,12 +12,11 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 //klasse: "Spel"
-public class Spel implements KeyListener, MouseListener, MouseMotionListener {
+public class Spel implements KeyListener {
 	/**
 	 * De attributen van de klasse
 	 */
 	
-	public ArrayList<Peer> peren;
 	public ArrayList<Enemy> enemies;
 	public Tekenaar t;
 	public ArrayList<Rand> randen;
@@ -28,6 +27,8 @@ public class Spel implements KeyListener, MouseListener, MouseMotionListener {
 	Enemy vijand;
 	Mario mario;
 	boolean gebotst;
+	int vx; //Alle objecten moeten meebewegen! Mario en achtergrond bewegen niet!
+	int tellerUp;
 	
 	
 	public Spel(){
@@ -37,10 +38,11 @@ public class Spel implements KeyListener, MouseListener, MouseMotionListener {
 		image = laadPlaatje("background.jpg");
 		bg = new Achtergrond(image, 0, 0, 1750, 750);
 		
-		createEnemies(1, 0, 0);
+		createEnemies(2, 0, 1);
 		
 		randen = new ArrayList<Rand>();
 		image = laadPlaatje("mysteryBox.jpg");
+		randen.add(new Rand(image, 500, 0, 50, 50));
 		randen.add(new Rand(image, 500, 200, 50, 50));
 		
 		JFrame scherm = new JFrame("Mario - Thomas & Niek");
@@ -61,10 +63,6 @@ public class Spel implements KeyListener, MouseListener, MouseMotionListener {
 		
 		running = true;
 		gebotst = false;
-		bg.vx = -1;
-		
-		t.addMouseListener(this);
-		t.addMouseMotionListener(this);
 		
 		while (running){
 			try{ Thread.sleep(10); } 
@@ -77,15 +75,22 @@ public class Spel implements KeyListener, MouseListener, MouseMotionListener {
 			mario.xOld = mario.x;
 			mario.yOld = mario.y;
 			
-			if(bg.x < -750) {
-				bg.x = 0;
+			for(Rand p : randen){
+				p.x += this.vx;
 			}
-			bg.x += bg.vx;
-			mario.x += mario.vx;
+			
 			mario.y += mario.vy;
-			//System.out.println("vx: " + mario.vx + " vy: " + mario.vy);
-			System.out.println(bg.x);
-			controleerRanden(mario, randen);
+			//System.out.println(enemies.get(0).vx);
+			if(mario.y < mario.spring -25) {
+				mario.vy=1;
+			}
+			
+			for(Enemy e : enemies) {
+				e.x += e.vx + this.vx;
+				e.y += e.vy;
+			}
+			
+			controleerRanden(mario, randen, enemies);
 			t.repaint();
 		}
 		scherm.dispose();
@@ -130,84 +135,38 @@ public class Spel implements KeyListener, MouseListener, MouseMotionListener {
 			running = false;
 		}
 		if(e.getKeyCode() == e.VK_RIGHT){
-			mario.vx = 1;
+			this.vx = -2;
 		}
 		if(e.getKeyCode() == e.VK_LEFT){
-			mario.vx = -1;
+			this.vx = 2;
 		}
 		if(e.getKeyCode() == e.VK_DOWN){
-			mario.vy = 1;
 		}
-		if(e.getKeyCode() == e.VK_UP){
-			mario.vy = -1;
+		if(e.getKeyCode() == e.VK_UP){ 
+			if(tellerUp == 0) {
+				mario.spring();
+				tellerUp++;
+			}
 		}
 		
 	}
 
 	public void keyReleased(KeyEvent e) {
 		if(e.getKeyCode() == e.VK_RIGHT){
-			mario.vx = 0;
+			this.vx = 0;
 		}
 		if(e.getKeyCode() == e.VK_LEFT){
-			mario.vx = 0;
-		}
-		if(e.getKeyCode() == e.VK_DOWN){
-			mario.vy = 0;
+			this.vx = 0;
 		}
 		if(e.getKeyCode() == e.VK_UP){
-			mario.vy = 0;
+			mario.vy = 1;
+			tellerUp = 0;
 		}
 	}
 
 	public void keyTyped(KeyEvent e) {
 	}
 
-	
-	public void mouseDragged(MouseEvent e) {
-		if(vijand != null){
-			vijand.x = (int) (e.getX() - 0.5 * vijand.breedte);
-			vijand.y = (int) (e.getY() - 0.5 * vijand.hoogte);
-		}
-	}
-
-	
-	public void mouseMoved(MouseEvent e) {
-
-	}
-
-	
-	public void mouseClicked(MouseEvent e) {
-		
-	}
-
-	
-	public void mouseEntered(MouseEvent e) {
-			
-	}
-
-	
-	public void mouseExited(MouseEvent e) {
-		
-	}
-
-	
-	public void mousePressed(MouseEvent e) {
-		for(Enemy p : enemies){
-				if(	(e.getX() > p.x) 
-					&& (e.getX() < p.x + p.breedte) 
-					&& (e.getY() > p.y) 
-					&& (e.getY() < p.y + p.hoogte)
-				){
-					vijand = p;
-					System.out.println("Ik heb op een enemy geklikt: " + vijand.getClass());
-				}
-		}
-	}
-
-	
-	public void mouseReleased(MouseEvent e) {
-		vijand = null;
-	}
 	
 	public boolean controleerContact(Mario a, ArrayList<Enemy> enemies) {
 		for(Enemy p : enemies){
@@ -225,14 +184,24 @@ public class Spel implements KeyListener, MouseListener, MouseMotionListener {
 		return false;
 	}
 	
-	public boolean controleerRanden(Mario a, ArrayList<Rand> rand){
+	public void controleerRanden(Mario a, ArrayList<Rand> rand, ArrayList<Enemy> b){
 		for(Rand p : rand){
 			if(a.x + a.breedte >= p.x && a.x <= p.x + p.breedte && a.y + a.breedte >= p.y && a.y <= p.y + p.breedte) {
 				a.x = a.xOld;
 				a.y = a.yOld;
-				return true;
+			}
+			
+			for(Enemy e : b) {
+				if(e.x + e.breedte >= p.x && e.x <= p.x + p.breedte && e.y + e.breedte >= p.y && e.y <= p.y + p.breedte) {
+					e.vx = -e.vx;
+					if(e instanceof ParaKoopaTroopa) {
+						e.vy = -e.vy;
+					} else {
+						e.vx = -e.vx;
+						System.out.println(e.vx);
+					}
+				}
 			}
 		}
-		return false;
 	}
 }

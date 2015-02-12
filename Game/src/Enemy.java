@@ -3,15 +3,16 @@ import java.awt.image.BufferedImage;
 
 public class Enemy {
 	public BufferedImage img;		// Een plaatje van de Enemy (in child gedefineerd)
-	public int x,y, breedte, hoogte;	// De plaats en afmeting van de Enemy in px (in child gedefineerd)
+	public int x,y, breedte, hoogte, vx, vy = 1;	// De plaats en afmeting van de Enemy in px (in child gedefineerd)
 	
-	public Enemy(BufferedImage image, int xBegin, int yBegin,int b, int h){
+	public Enemy(BufferedImage image, int xBegin, int yBegin,int b, int h, int vx, int vy){
 		this.img = image;
 		this.x = xBegin;
 		this.y = yBegin;
 		this.breedte = b;
 		this.hoogte = h;
-		
+		this.vx = vx;
+		this.vy = vy;
 	}
 	
 	public void lopen() {
