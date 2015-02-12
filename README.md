@@ -6,8 +6,12 @@ Thomas W. & Niek B.
 	-Daarom is het plaatsen van comments nog niet rendabel
 
 ## Planning
-- Mario op juiste manier over ondergrond laten lopen en springen
+- ~~Mario op juiste manier over ondergrond laten lopen en springen~~
 - Gemaakte vijanden passende eigenschappen geven
+
+## 12-2
+- Mario kan nu op goede manier springen (Niek)
+- Kogels schieten (begin) (Thomas)
 
 ## 11-2
 - Uitvinden hoe synchronisatie het beste kan (GitHub)
