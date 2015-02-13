@@ -1,3 +1,7 @@
+# Feedback Game
+
+Feeback kan gegeven worden via http://niekbrekelmans.esy.es/, een hiervoor ingerichte website!
+
 # Logboek
 Thomas W. & Niek B.
 
