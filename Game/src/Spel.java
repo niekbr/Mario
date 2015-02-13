@@ -1,8 +1,5 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import javax.swing.JLabel;
 import java.io.File;
@@ -26,13 +23,12 @@ public class Spel implements KeyListener {
 	JLabel score;
 	JLabel ammunitie;
 	boolean running;
-	boolean flying;
 	Achtergrond bg;
 	Enemy vijand;
 	Mario mario;
 	boolean gebotst;
-	int vx; //Alle objecten moeten meebewegen! Mario en achtergrond bewegen niet!
-	int teller;
+	int vx; //Alle objecten moeten meebewegen! Mario en achtergrond bewegen niet als enige!
+	boolean teller;
 	Kogel deleteKogel;
 	Kogel standaardKogel;
 	
@@ -48,8 +44,10 @@ public class Spel implements KeyListener {
 		
 		randen = new ArrayList<Rand>();
 		image = laadPlaatje("mysteryBox.jpg");
-		randen.add(new Rand(image, 500, 0, 50, 50));
+		randen.add(new Rand(image, 500, 150, 50, 50));
 		randen.add(new Rand(image, 500, 200, 50, 50));
+		randen.add(new Rand(image, 450, 200, 50, 50));
+		randen.add(new Rand(image, 400, 200, 50, 50));
 		
 		kogels = new ArrayList<Kogel>();
 		image = laadPlaatje("kogel.png");
@@ -76,24 +74,6 @@ public class Spel implements KeyListener {
 		
 		running = true;
 		gebotst = false;
-		flying = true;
-		
-		while (flying){
-			try{ Thread.sleep(10); }catch(InterruptedException e){ e.printStackTrace(); }
-			for(Kogel k : kogels){
-				k.x += k.vx;
-				if(k.y < 0 || k.y > scherm.getHeight() || k.x < 0 || k.x > scherm.getWidth()){
-					deleteKogel = k;
-				}
-			}
-			gebotst = controleerSchot(kogels, enemies);
-			if(gebotst){
-				enemies.remove(vijand);
-				score.setText("Score: " + punten);
-			}
-			kogels.remove(deleteKogel);
-			t.repaint();
-		}
 		
 		while (running){
 			try{ Thread.sleep(10); } 
@@ -105,6 +85,10 @@ public class Spel implements KeyListener {
 			}
 			mario.xOld = mario.x;
 			mario.yOld = mario.y;
+			
+			for(Enemy e : enemies) {
+				e.yOld = e.y;
+			}
 			
 			for(Rand p : randen){
 				p.x += this.vx;
@@ -120,6 +104,20 @@ public class Spel implements KeyListener {
 				e.x += e.vx + this.vx;
 				e.y += e.vy;
 			}
+			
+			for(Kogel k : kogels){
+				k.x += k.vx;
+				if(k.y < 0 || k.y > scherm.getHeight() || k.x < 0 || k.x > scherm.getWidth()){
+					deleteKogel = k;
+				}
+			}
+			gebotst = controleerSchot(kogels, enemies);
+			if(gebotst){
+				enemies.remove(vijand);
+				score.setText("Score: " + punten);
+			}
+			
+			kogels.remove(deleteKogel);
 			
 			controleerRanden(mario, randen, enemies);
 			t.repaint();
@@ -174,17 +172,17 @@ public class Spel implements KeyListener {
 		if(e.getKeyCode() == e.VK_DOWN){
 		}
 		if(e.getKeyCode() == e.VK_UP){ 
-			if(teller == 0) {
+			if(!teller) {
 				mario.spring();
-				teller++;
+				teller = true;
 			}
 		}
 		if(e.getKeyCode() == e.VK_SPACE){
-			if(ammo > 0 && teller == 0){
+			if(ammo > 0 && !teller){
 				maakKogel();
 				ammo--;
 				ammunitie.setText("                                                                                                                        Ammo: " + ammo);
-				teller++;
+				teller = true;
 			}
 		}
 		
@@ -199,10 +197,10 @@ public class Spel implements KeyListener {
 		}
 		if(e.getKeyCode() == e.VK_UP){
 			mario.vy = 1;
-			teller = 0;
+			teller = false;
 		}
 		if(e.getKeyCode() == e.VK_SPACE) {
-			teller--;
+			teller = false;
 		}
 	}
 
@@ -248,18 +246,21 @@ public class Spel implements KeyListener {
 	public void controleerRanden(Mario a, ArrayList<Rand> rand, ArrayList<Enemy> b){
 		for(Rand p : rand){
 			if(a.x + a.breedte >= p.x && a.x <= p.x + p.breedte && a.y + a.breedte >= p.y && a.y <= p.y + p.breedte) {
-				a.x = a.xOld;
 				a.y = a.yOld;
 			}
 			
 			for(Enemy e : b) {
+				
 				if(e.x + e.breedte >= p.x && e.x <= p.x + p.breedte && e.y + e.breedte >= p.y && e.y <= p.y + p.breedte) {
-					e.vx = -e.vx;
 					if(e instanceof ParaKoopaTroopa) {
 						e.vy = -e.vy;
 					} else {
-						e.vx = -e.vx;
-						//System.out.println(e.vx);
+						if(e.y + e.hoogte == p.y){
+							//e.x = e.xOld;
+							e.y = e.yOld;
+						} else {
+							e.vx = -e.vx;
+						}
 					}
 				}
 			}
