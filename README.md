@@ -9,6 +9,14 @@ Thomas W. & Niek B.
 - ~~Mario op juiste manier over ondergrond laten lopen en springen~~
 - Gemaakte vijanden passende eigenschappen geven
 
+## 13-2
+- Springen kan nu niet meer in de lucht (alleen als je op de grond staat)
+- Kogel schieten werkt!
+- Enemies hebben nu ook zwaartekracht
+- Botsen enemies <--> rand/grond:
+	- verticaal: niet door de grond zakken
+	- horizontaal: de enemy draait om (links --> rechts en andersom)
+
 ## 12-2
 - Mario kan nu op goede manier springen (Niek)
 - Kogels schieten (begin) (Thomas)
