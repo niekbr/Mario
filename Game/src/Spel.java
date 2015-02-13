@@ -18,7 +18,8 @@ public class Spel implements KeyListener {
 	Tekenaar t;
 	ArrayList<Rand> randen;
 	ArrayList<Kogel> kogels;
-	int punten = 5;
+	ArrayList<Coin> coins;
+	int punten = 11;
 	int ammo = 5;
 	BufferedImage image;
 	JLabel score;
@@ -31,7 +32,10 @@ public class Spel implements KeyListener {
 	int vx; //Alle objecten moeten meebewegen! Mario en achtergrond bewegen niet als enige!
 	boolean teller;
 	Kogel deleteKogel;
-	
+	String plaatjes; //Het converteren van een int naar plaatjes bij updateCoins()
+	int coin; //Save van het aantal dat coins nu op staat
+	boolean changed;
+
 	
 	public Spel(){
 		image = laadPlaatje("mario.gif");
@@ -46,8 +50,9 @@ public class Spel implements KeyListener {
 		image = laadPlaatje("mysteryBox.jpg");
 		randen.add(new Rand(image, 1000, 500, 25, 25));
 		
+		coins = new ArrayList<Coin>();
 		
-		createGrass(50);
+		createMap();
 		
 		kogels = new ArrayList<Kogel>();
 		image = laadPlaatje("kogel.png");
@@ -56,7 +61,7 @@ public class Spel implements KeyListener {
 		scherm.setBounds(0, 0, 1000, 600);
 		scherm.setLayout(null);
 		
-		t = new Tekenaar(kogels, bg, enemies, mario, randen);
+		t = new Tekenaar(kogels, bg, enemies, mario, randen, coins);
 		t.setBounds(0, 0, 1000, 600);		
 		score = new JLabel("Score: " + punten);	//maak een nieuw JLabel object
 		t.add(score);				// en voeg deze aan je JPanel(Tekenaar) toe
@@ -73,6 +78,8 @@ public class Spel implements KeyListener {
 		
 		running = true;
 		gebotst = false;
+		coin = 0;
+		changed = false;
 		
 		while (running){
 			try{ Thread.sleep(10); } 
@@ -114,6 +121,12 @@ public class Spel implements KeyListener {
 			controleerSchot(kogels, enemies, randen);
 			controleerMario(mario, randen);
 			controleerEnemies(randen, enemies);
+			
+			//Checkt of de coins moeten worden geupdate
+			if(coin != punten){
+				updateCoins(punten);
+			}
+			
 			t.repaint();
 		}
 		scherm.dispose();
@@ -129,12 +142,14 @@ public class Spel implements KeyListener {
 		 }
 		 return img;
 	}
-	private void createGrass(int aantal) {
+	
+	private void createMap(){
 		image = laadPlaatje("grass.jpg");
-		for(int i=0; i<aantal; i++) {
+		for(int i=0; i<30; i++) {
 			this.randen.add(new Rand(image, 50*i, 525, 50, 50));
 		}
 	}
+
 	//Hier alle enemies aanmaken --> Constructor Enemy: Enemy(image, x, y, breedte, hoogte);
 	//Arguments: aantal van iedere enemy!
 	private void createEnemies(int goombas, int koopatroopas, int parakoopatroopas) {
@@ -280,5 +295,27 @@ public class Spel implements KeyListener {
 			}
 			
 		}
+	}
+	
+	public void updateCoins(int p){
+		//Checkt of de code min. 1x is gerunt en cleart dan pas de coins list (anders komt er een error)
+		if(changed != true){
+			coins.clear();
+			changed = true;
+		}
+		//Als de punten nog niet hoger dan 10 zijn dan hoeven er geen twee cijfers getekent te worden
+		if(p < 10){
+			plaatjes = Integer.toString(p) + ".png";
+			coins.add(new Coin(laadPlaatje(plaatjes), 50 ,20, 30, 30));
+		}
+		//Nu moet er een cijfertje extra bij komen
+		if(p > 10){
+			plaatjes = Integer.toString(p-10) + ".png";
+			coins.add(new Coin(laadPlaatje("1.png"), 50 ,20, 30, 30));
+			coins.add(new Coin(laadPlaatje(plaatjes), 70 ,20, 30, 30));
+		}
+		//Tekent standaard de coin en stelt de coins gelijk aan punten (kijk while functie)
+		coin = punten;
+		coins.add(new Coin(laadPlaatje("coin.png"), 10,10, 50, 50));
 	}
 }
