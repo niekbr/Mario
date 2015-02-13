@@ -112,15 +112,9 @@ public class Spel implements KeyListener {
 					deleteKogel = k;
 				}
 			}
-			gebotst = controleerSchot(kogels, enemies);
-			if(gebotst){
-				enemies.remove(vijand);
-				score.setText("Score: " + punten);
-			}
-			
 			kogels.remove(deleteKogel);
-			
-			controleerRanden(mario, randen, enemies);
+			controleerMario(mario, randen);
+			controleerEnemies(randen, enemies);
 			t.repaint();
 		}
 		scherm.dispose();
@@ -250,17 +244,14 @@ public class Spel implements KeyListener {
 		}
 		return false;
 	}
-	
-	public void controleerRanden(Mario a, ArrayList<Rand> rand, ArrayList<Enemy> b){
-		for(Rand p : rand) {
-			
-			for(Enemy e : b) {
-				
-				if(e.x + e.breedte >= p.x && e.x <= p.x + p.breedte && e.y + e.breedte >= p.y && e.y <= p.y + p.breedte) {
+	public void controleerEnemies(ArrayList<Rand> randen, ArrayList<Enemy> enemies){
+		for(Enemy e: enemies){
+			for(Rand r: randen){
+				if(e.x + e.breedte >= r.x && e.x <= r.x + r.breedte && e.y + e.breedte >= r.y && e.y <= r.y + r.breedte) {
 					if(e instanceof ParaKoopaTroopa) {
 						e.vy = -e.vy;
 					} else {
-						if(e.y + e.hoogte == p.y){
+						if(e.y + e.hoogte == r.y){
 							e.y = e.yOld;
 						} else {
 							e.vx = -e.vx;
@@ -268,7 +259,11 @@ public class Spel implements KeyListener {
 					}
 				}
 			}
-		
+		}
+	}
+	
+	public void controleerMario(Mario a, ArrayList<Rand> rand){
+		for(Rand p : rand) {
 			if(a.x + a.breedte >= p.x && a.x <= p.x + p.breedte && a.y + a.breedte >= p.y && a.y <= p.y + p.breedte) {
 				if(a.y + a.hoogte == p.y) {
 					a.platform = true;
