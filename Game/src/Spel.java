@@ -31,12 +31,11 @@ public class Spel implements KeyListener {
 	int vx; //Alle objecten moeten meebewegen! Mario en achtergrond bewegen niet als enige!
 	boolean teller;
 	Kogel deleteKogel;
-	Kogel standaardKogel;
 	
 	
 	public Spel(){
 		image = laadPlaatje("mario.gif");
-		mario = new Mario(image, 500, 450, 40, 40);
+		mario = new Mario(image, 500, 400, 30, 60);
 		
 		image = laadPlaatje("background.jpg");
 		bg = new Achtergrond(image, 0, 0, 1750, 750);
@@ -52,7 +51,6 @@ public class Spel implements KeyListener {
 		
 		kogels = new ArrayList<Kogel>();
 		image = laadPlaatje("kogel.png");
-		standaardKogel = new Kogel(image, mario.x + 30, mario.y, 32, 26, 2, 0);
 		
 		JFrame scherm = new JFrame("Mario - Thomas & Niek");
 		scherm.setBounds(0, 0, 1000, 600);
@@ -113,6 +111,8 @@ public class Spel implements KeyListener {
 				}
 			}
 			kogels.remove(deleteKogel);
+			controleerMario(mario,randen);
+			controleerSchot(kogels, enemies, randen);
 			controleerMario(mario, randen);
 			controleerEnemies(randen, enemies);
 			t.repaint();
@@ -210,7 +210,7 @@ public class Spel implements KeyListener {
 	}
 
 	public void maakKogel(){
-		kogels.add(new Kogel(laadPlaatje("kogel.png"), mario.x + mario.breedte, mario.y, 32, 26, 3, 0));
+		kogels.add(new Kogel(laadPlaatje("kogel.png"), mario.x + mario.breedte, mario.y + 20, 32, 26, 3, 0));
 	}
 	
 	public boolean controleerContact(Mario a, ArrayList<Enemy> enemies) {
@@ -229,15 +229,21 @@ public class Spel implements KeyListener {
 		return false;
 	}
 	
-	public boolean controleerSchot(ArrayList<Kogel> kogels, ArrayList<Enemy> enemies) {
-		for(Enemy p : enemies){
-			for(Kogel k : kogels){
+	public boolean controleerSchot(ArrayList<Kogel> kogels, ArrayList<Enemy> enemies, ArrayList<Rand> randen) {
+		for(Kogel k : kogels){
+			for(Enemy p : enemies){
 				if(k.x + k.breedte >= p.x && k.x <= p.x + p.breedte && k.y + k.breedte >= p.y && k.y <= p.y + p.breedte) {
 					kogels.remove(k);
 					enemies.remove(p);
 					punten++;
 					score.setText("Score: " + punten);
 					t.repaint();
+					return true;
+				}
+			}
+			for(Rand r : randen){
+				if(k.x + k.breedte >= r.x && k.x <= r.x + r.breedte && k.y + k.breedte >= r.y && k.y <= r.y + r.breedte) {
+					kogels.remove(k);
 					return true;
 				}
 			}
@@ -264,7 +270,7 @@ public class Spel implements KeyListener {
 	
 	public void controleerMario(Mario a, ArrayList<Rand> rand){
 		for(Rand p : rand) {
-			if(a.x + a.breedte >= p.x && a.x <= p.x + p.breedte && a.y + a.breedte >= p.y && a.y <= p.y + p.breedte) {
+			if(a.x + a.breedte >= p.x && a.x <= p.x + p.breedte && a.y + a.breedte + 30 >= p.y && a.y <= p.y + p.breedte) {
 				if(a.y + a.hoogte == p.y) {
 					a.platform = true;
 					break;
