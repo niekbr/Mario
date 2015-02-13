@@ -14,12 +14,13 @@ public class Spel implements KeyListener {
 	 * De attributen van de klasse
 	 */
 	
-	public ArrayList<Enemy> enemies;
-	public Tekenaar t;
-	public ArrayList<Rand> randen;
-	public ArrayList<Kogel> kogels;
+	ArrayList<Enemy> enemies;
+	Tekenaar t;
+	ArrayList<Rand> randen;
+	ArrayList<Kogel> kogels;
 	int punten = 5;
 	int ammo = 5;
+	BufferedImage image;
 	JLabel score;
 	JLabel ammunitie;
 	boolean running;
@@ -34,20 +35,20 @@ public class Spel implements KeyListener {
 	
 	
 	public Spel(){
-		BufferedImage image = laadPlaatje("mario.gif");
-		mario = new Mario(image, 500, 100, 40, 40);
+		image = laadPlaatje("mario.gif");
+		mario = new Mario(image, 500, 450, 40, 40);
 		
 		image = laadPlaatje("background.jpg");
 		bg = new Achtergrond(image, 0, 0, 1750, 750);
 		
-		createEnemies(2, 0, 1);
+		createEnemies(3, 0, 0);
 		
 		randen = new ArrayList<Rand>();
 		image = laadPlaatje("mysteryBox.jpg");
-		randen.add(new Rand(image, 500, 150, 50, 50));
-		randen.add(new Rand(image, 500, 200, 50, 50));
-		randen.add(new Rand(image, 450, 200, 50, 50));
-		randen.add(new Rand(image, 400, 200, 50, 50));
+		randen.add(new Rand(image, 1000, 500, 25, 25));
+		
+		
+		createGrass(50);
 		
 		kogels = new ArrayList<Kogel>();
 		image = laadPlaatje("kogel.png");
@@ -120,6 +121,7 @@ public class Spel implements KeyListener {
 			kogels.remove(deleteKogel);
 			
 			controleerRanden(mario, randen, enemies);
+			System.out.println(mario.platform);
 			t.repaint();
 		}
 		scherm.dispose();
@@ -135,7 +137,12 @@ public class Spel implements KeyListener {
 		 }
 		 return img;
 	}
-	
+	private void createGrass(int aantal) {
+		image = laadPlaatje("grass.jpg");
+		for(int i=0; i<aantal; i++) {
+			this.randen.add(new Rand(image, 50*i, 525, 50, 50));
+		}
+	}
 	//Hier alle enemies aanmaken --> Constructor Enemy: Enemy(image, x, y, breedte, hoogte);
 	//Arguments: aantal van iedere enemy!
 	private void createEnemies(int goombas, int koopatroopas, int parakoopatroopas) {
@@ -173,8 +180,10 @@ public class Spel implements KeyListener {
 		}
 		if(e.getKeyCode() == e.VK_UP){ 
 			if(!teller) {
-				mario.spring();
-				teller = true;
+				if(mario.platform) {
+					mario.spring();
+					teller = true;
+				}
 			}
 		}
 		if(e.getKeyCode() == e.VK_SPACE){
@@ -244,10 +253,7 @@ public class Spel implements KeyListener {
 	}
 	
 	public void controleerRanden(Mario a, ArrayList<Rand> rand, ArrayList<Enemy> b){
-		for(Rand p : rand){
-			if(a.x + a.breedte >= p.x && a.x <= p.x + p.breedte && a.y + a.breedte >= p.y && a.y <= p.y + p.breedte) {
-				a.y = a.yOld;
-			}
+		for(Rand p : rand) {
 			
 			for(Enemy e : b) {
 				
@@ -256,7 +262,6 @@ public class Spel implements KeyListener {
 						e.vy = -e.vy;
 					} else {
 						if(e.y + e.hoogte == p.y){
-							//e.x = e.xOld;
 							e.y = e.yOld;
 						} else {
 							e.vx = -e.vx;
@@ -264,6 +269,17 @@ public class Spel implements KeyListener {
 					}
 				}
 			}
+		
+			if(a.x + a.breedte >= p.x && a.x <= p.x + p.breedte && a.y + a.breedte >= p.y && a.y <= p.y + p.breedte) {
+				if(a.y + a.hoogte == p.y) {
+					a.platform = true;
+					break;
+				} 
+				a.y = a.yOld;
+			} else {
+				a.platform = false;
+			}
+			
 		}
 	}
 }
