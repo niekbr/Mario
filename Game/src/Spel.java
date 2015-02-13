@@ -28,6 +28,7 @@ public class Spel implements KeyListener {
 	Achtergrond bg;
 	Enemy vijand;
 	Mario mario;
+	JFrame scherm;
 	boolean gebotst;
 	int vx; //Alle objecten moeten meebewegen! Mario en achtergrond bewegen niet als enige!
 	boolean teller;
@@ -51,30 +52,10 @@ public class Spel implements KeyListener {
 		randen.add(new Rand(image, 1000, 500, 25, 25));
 		
 		coins = new ArrayList<Coin>();
-		
-		createMap();
-		
 		kogels = new ArrayList<Kogel>();
 		image = laadPlaatje("kogel.png");
 		
-		JFrame scherm = new JFrame("Mario - Thomas & Niek");
-		scherm.setBounds(0, 0, 1000, 600);
-		scherm.setLayout(null);
-		
-		t = new Tekenaar(kogels, bg, enemies, mario, randen, coins);
-		t.setBounds(0, 0, 1000, 600);		
-		score = new JLabel("Score: " + punten);	//maak een nieuw JLabel object
-		t.add(score);				// en voeg deze aan je JPanel(Tekenaar) toe
-		
-		ammunitie = new JLabel("                                                                                                                        Ammo: " + ammo);
-		t.add(ammunitie);
-		scherm.add(t);
-		
-		
-		scherm.setVisible(true);
-		scherm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		scherm.addKeyListener(this);
+		createMap();
 		
 		running = true;
 		gebotst = false;
@@ -150,6 +131,25 @@ public class Spel implements KeyListener {
 		for(int i=0; i<30; i++) {
 			this.randen.add(new Rand(image, 50*i, 525, 50, 50));
 		}
+		
+		scherm = new JFrame("Mario - Thomas & Niek");
+		scherm.setBounds(0, 0, 1000, 600);
+		scherm.setLayout(null);
+		
+		t = new Tekenaar(kogels, bg, enemies, mario, randen, coins);
+		t.setBounds(0, 0, 1000, 600);		
+		score = new JLabel("Score: " + punten);	//maak een nieuw JLabel object
+		t.add(score);				// en voeg deze aan je JPanel(Tekenaar) toe
+		
+		ammunitie = new JLabel("                                                                                                                        Ammo: " + ammo);
+		t.add(ammunitie);
+		scherm.add(t);
+		
+		
+		scherm.setVisible(true);
+		scherm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		scherm.addKeyListener(this);
 	}
 
 	//Hier alle enemies aanmaken --> Constructor Enemy: Enemy(image, x, y, breedte, hoogte);
