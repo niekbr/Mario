@@ -21,7 +21,9 @@ public class Spel implements KeyListener {
 	public Tekenaar t;
 	public ArrayList<Rand> randen;
 	int punten = 5;
+	int ammo = 5;
 	JLabel score;
+	JLabel ammunitie;
 	boolean running;
 	Achtergrond bg;
 	Enemy vijand;
@@ -29,6 +31,8 @@ public class Spel implements KeyListener {
 	boolean gebotst;
 	int vx; //Alle objecten moeten meebewegen! Mario en achtergrond bewegen niet!
 	int tellerUp;
+	Kogel deleteKogel;
+	Kogel standaardKogel;
 	
 	
 	public Spel(){
@@ -45,6 +49,10 @@ public class Spel implements KeyListener {
 		randen.add(new Rand(image, 500, 0, 50, 50));
 		randen.add(new Rand(image, 500, 200, 50, 50));
 		
+		kogels = new ArrayList<Kogel>();
+		image = laadPlaatje("kogel.png");
+		standaardKogel = new Kogel(image, mario.x + 30, mario.y, 32, 26, 2, 0);
+		
 		JFrame scherm = new JFrame("Mario - Thomas & Niek");
 		scherm.setBounds(0, 0, 1000, 600);
 		scherm.setLayout(null);
@@ -54,7 +62,10 @@ public class Spel implements KeyListener {
 		score = new JLabel("Score: " + punten);	//maak een nieuw JLabel object
 		t.add(score);				// en voeg deze aan je JPanel(Tekenaar) toe
 		
+		ammunitie = new JLabel("                                                                                                                        Ammo: " + ammo);
+		t.add(ammunitie);
 		scherm.add(t);
+		
 		
 		scherm.setVisible(true);
 		scherm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
