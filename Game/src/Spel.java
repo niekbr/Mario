@@ -20,17 +20,19 @@ public class Spel implements KeyListener {
 	public ArrayList<Enemy> enemies;
 	public Tekenaar t;
 	public ArrayList<Rand> randen;
+	public ArrayList<Kogel> kogels;
 	int punten = 5;
 	int ammo = 5;
 	JLabel score;
 	JLabel ammunitie;
 	boolean running;
+	boolean flying;
 	Achtergrond bg;
 	Enemy vijand;
 	Mario mario;
 	boolean gebotst;
 	int vx; //Alle objecten moeten meebewegen! Mario en achtergrond bewegen niet!
-	int tellerUp;
+	int teller;
 	Kogel deleteKogel;
 	Kogel standaardKogel;
 	
@@ -57,7 +59,7 @@ public class Spel implements KeyListener {
 		scherm.setBounds(0, 0, 1000, 600);
 		scherm.setLayout(null);
 		
-		t = new Tekenaar(bg, enemies, mario, randen);
+		t = new Tekenaar(kogels, bg, enemies, mario, randen);
 		t.setBounds(0, 0, 1000, 600);		
 		score = new JLabel("Score: " + punten);	//maak een nieuw JLabel object
 		t.add(score);				// en voeg deze aan je JPanel(Tekenaar) toe
@@ -74,6 +76,7 @@ public class Spel implements KeyListener {
 		
 		running = true;
 		gebotst = false;
+		flying = true;
 		
 		while (flying){
 			try{ Thread.sleep(10); }catch(InterruptedException e){ e.printStackTrace(); }
@@ -171,16 +174,17 @@ public class Spel implements KeyListener {
 		if(e.getKeyCode() == e.VK_DOWN){
 		}
 		if(e.getKeyCode() == e.VK_UP){ 
-			if(tellerUp == 0) {
+			if(teller == 0) {
 				mario.spring();
-				tellerUp++;
+				teller++;
 			}
 		}
 		if(e.getKeyCode() == e.VK_SPACE){
-			if(ammo > 0){
+			if(ammo > 0 && teller == 0){
 				maakKogel();
 				ammo--;
 				ammunitie.setText("                                                                                                                        Ammo: " + ammo);
+				teller++;
 			}
 		}
 		
@@ -195,7 +199,10 @@ public class Spel implements KeyListener {
 		}
 		if(e.getKeyCode() == e.VK_UP){
 			mario.vy = 1;
-			tellerUp = 0;
+			teller = 0;
+		}
+		if(e.getKeyCode() == e.VK_SPACE) {
+			teller--;
 		}
 	}
 
@@ -252,7 +259,7 @@ public class Spel implements KeyListener {
 						e.vy = -e.vy;
 					} else {
 						e.vx = -e.vx;
-						System.out.println(e.vx);
+						//System.out.println(e.vx);
 					}
 				}
 			}
