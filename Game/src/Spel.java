@@ -84,13 +84,14 @@ public class Spel implements KeyListener {
 		while (running){
 			try{ Thread.sleep(10); } 
 			catch(InterruptedException e){ e.printStackTrace();}
+			mario.xOld = mario.x;
+			mario.yOld = mario.y;
+			
 			gebotst = controleerContact(mario, enemies);
 			if(gebotst){
 				enemies.remove(vijand);
 				score.setText("Score: " + punten);
 			}
-			mario.xOld = mario.x;
-			mario.yOld = mario.y;
 			
 			for(Enemy e : enemies) {
 				e.yOld = e.y;
@@ -101,8 +102,7 @@ public class Spel implements KeyListener {
 			}
 			
 			mario.y += mario.vy;
-			//System.out.println(enemies.get(0).vx);
-			if(mario.y < mario.spring -25) {
+			if(mario.y < mario.spring - 50 && mario.vy != 1) {
 				mario.vy=1;
 			}
 			
@@ -117,7 +117,9 @@ public class Spel implements KeyListener {
 					deleteKogel = k;
 				}
 			}
+			
 			kogels.remove(deleteKogel);
+			
 			controleerSchot(kogels, enemies, randen);
 			controleerMario(mario, randen);
 			controleerEnemies(randen, enemies);
@@ -283,15 +285,16 @@ public class Spel implements KeyListener {
 	}
 	
 	public void controleerMario(Mario a, ArrayList<Rand> rand){
+		a.platform = false;
 		for(Rand p : rand) {
 			if(a.x + a.breedte >= p.x && a.x <= p.x + p.breedte && a.y + a.breedte + 30 >= p.y && a.y <= p.y + p.breedte) {
-				if(a.y + a.hoogte == p.y) {
+				
+				if(a.y + a.hoogte == p.y){
 					a.platform = true;
-					break;
-				} 
-				a.y = a.yOld;
-			} else {
-				a.platform = false;
+					a.y = a.yOld;
+				} else {
+					vx = 0;
+				}
 			}
 			
 		}
@@ -299,7 +302,7 @@ public class Spel implements KeyListener {
 	
 	public void updateCoins(int p){
 		//Checkt of de code min. 1x is gerunt en cleart dan pas de coins list (anders komt er een error)
-		if(changed != true){
+		if(!changed){
 			coins.clear();
 		}
 		changed = false;
