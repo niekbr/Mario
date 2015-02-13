@@ -75,6 +75,23 @@ public class Spel implements KeyListener {
 		running = true;
 		gebotst = false;
 		
+		while (flying){
+			try{ Thread.sleep(10); }catch(InterruptedException e){ e.printStackTrace(); }
+			for(Kogel k : kogels){
+				k.x += k.vx;
+				if(k.y < 0 || k.y > scherm.getHeight() || k.x < 0 || k.x > scherm.getWidth()){
+					deleteKogel = k;
+				}
+			}
+			gebotst = controleerSchot(kogels, enemies);
+			if(gebotst){
+				enemies.remove(vijand);
+				score.setText("Score: " + punten);
+			}
+			kogels.remove(deleteKogel);
+			t.repaint();
+		}
+		
 		while (running){
 			try{ Thread.sleep(10); } 
 			catch(InterruptedException e){ e.printStackTrace();}
@@ -159,6 +176,13 @@ public class Spel implements KeyListener {
 				tellerUp++;
 			}
 		}
+		if(e.getKeyCode() == e.VK_SPACE){
+			if(ammo > 0){
+				maakKogel();
+				ammo--;
+				ammunitie.setText("                                                                                                                        Ammo: " + ammo);
+			}
+		}
 		
 	}
 
@@ -178,6 +202,9 @@ public class Spel implements KeyListener {
 	public void keyTyped(KeyEvent e) {
 	}
 
+	public void maakKogel(){
+		kogels.add(new Kogel(laadPlaatje("kogel.png"), mario.x + mario.breedte, mario.y, 32, 26, 3, 0));
+	}
 	
 	public boolean controleerContact(Mario a, ArrayList<Enemy> enemies) {
 		for(Enemy p : enemies){
@@ -190,6 +217,22 @@ public class Spel implements KeyListener {
 					punten--;
 				}
 				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean controleerSchot(ArrayList<Kogel> kogels, ArrayList<Enemy> enemies) {
+		for(Enemy p : enemies){
+			for(Kogel k : kogels){
+				if(k.x + k.breedte >= p.x && k.x <= p.x + p.breedte && k.y + k.breedte >= p.y && k.y <= p.y + p.breedte) {
+					kogels.remove(k);
+					enemies.remove(p);
+					punten++;
+					score.setText("Score: " + punten);
+					t.repaint();
+					return true;
+				}
 			}
 		}
 		return false;
