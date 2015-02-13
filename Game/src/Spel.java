@@ -121,7 +121,6 @@ public class Spel implements KeyListener {
 			kogels.remove(deleteKogel);
 			
 			controleerRanden(mario, randen, enemies);
-			System.out.println(mario.platform);
 			t.repaint();
 		}
 		scherm.dispose();
