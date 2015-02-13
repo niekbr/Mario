@@ -65,7 +65,6 @@ public class Spel implements KeyListener {
 		while (running){
 			try{ Thread.sleep(10); } 
 			catch(InterruptedException e){ e.printStackTrace();}
-			mario.xOld = mario.x;
 			mario.yOld = mario.y;
 			
 			gebotst = controleerContact(mario, enemies);
@@ -86,14 +85,14 @@ public class Spel implements KeyListener {
 			if(mario.y < mario.spring - 50 && mario.vy != 1) {
 				mario.vy=1;
 			}
-			
+			//laat enemies lopen op eigen snelheid (en meebewegen met scherm!)
 			for(Enemy e : enemies) {
 				e.x += e.vx + this.vx;
 				e.y += e.vy;
 			}
 			
 			for(Kogel k : kogels){
-				k.x += k.vx;
+				k.x += k.vx + this.vx;
 				if(k.y < 0 || k.y > scherm.getHeight() || k.x < 0 || k.x > scherm.getWidth()){
 					deleteKogel = k;
 				}
@@ -231,8 +230,14 @@ public class Spel implements KeyListener {
 	
 	public boolean controleerContact(Mario a, ArrayList<Enemy> enemies) {
 		for(Enemy p : enemies){
-			
 			if(a.x + a.breedte >= p.x && a.x <= p.x + p.breedte && a.y + a.breedte >= p.y && a.y <= p.y + p.breedte) {
+				
+				/**
+				 * 
+				 * Contact tussen Mario en Enemy wordt NIET opgemerkt als enemy over de grond loopt
+				 * 
+				 */
+				
 				this.vijand = p;
 				if(p instanceof KoopaTroopa) {
 					punten++;
