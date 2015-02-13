@@ -301,8 +301,8 @@ public class Spel implements KeyListener {
 		//Checkt of de code min. 1x is gerunt en cleart dan pas de coins list (anders komt er een error)
 		if(changed != true){
 			coins.clear();
-			changed = true;
 		}
+		changed = false;
 		//Als de punten nog niet hoger dan 10 zijn dan hoeven er geen twee cijfers getekent te worden
 		if(p < 10){
 			plaatjes = Integer.toString(p) + ".png";
