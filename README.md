@@ -13,6 +13,9 @@ Thomas W. & Niek B.
 - ~~Mario op juiste manier over ondergrond laten lopen en springen~~
 - Gemaakte vijanden passende eigenschappen geven
 
+## 14-2
+**NOG TE DOEN**
+
 ## 13-2
 - Springen kan nu niet meer in de lucht (alleen als je op de grond staat)
 - Kogel schieten werkt!
