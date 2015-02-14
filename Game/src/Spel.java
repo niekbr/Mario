@@ -230,7 +230,7 @@ public class Spel implements KeyListener {
 	public boolean controleerContact(Mario a, ArrayList<Enemy> enemies) {
 		for(Enemy p : enemies){
 			
-			if(a.x + a.breedte >= p.x && a.x <= p.x + p.breedte && a.y + a.breedte >= p.y && a.y <= p.y + p.breedte) {
+			if(a.x + a.breedte >= p.x && a.x <= p.x + p.breedte && a.y + a.breedte + 30>= p.y && a.y <= p.y + p.breedte) {
 				this.vijand = p;
 				if(p instanceof KoopaTroopa) {
 					punten++;
@@ -309,7 +309,7 @@ public class Spel implements KeyListener {
 			coins.add(new Coin(laadPlaatje(plaatjes), 50 ,20, 30, 30));
 		}
 		//Nu moet er een cijfertje extra bij komen
-		if(p > 10){
+		if(p > 9){
 			plaatjes = Integer.toString(p-10) + ".png";
 			coins.add(new Coin(laadPlaatje("1.png"), 50 ,20, 30, 30));
 			coins.add(new Coin(laadPlaatje(plaatjes), 70 ,20, 30, 30));
