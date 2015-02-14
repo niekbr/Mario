@@ -299,13 +299,13 @@ public class Spel implements KeyListener {
 			if(a.x + a.breedte >= p.x && a.x <= p.x + p.breedte && a.y + a.breedte + 30 >= p.y && a.y <= p.y + p.breedte) {
 				if(a.y + a.hoogte == p.y || a.y == p.y + p.hoogte) {
 					a.platform = true;
-					a.y = a.yOld;
+					a.y = a.yOld - 1;
 				} else {
 					if (a.x + a.breedte == p.x){
 						this.bounceLeft = true;
 						vx = 0;
 					}
-					if(a.x == p.x + p.breedte) {
+					if(a.x - 30 < p.x + p.breedte) {
 						this.bounceRight = true;
 						vx = 0;
 						/**
@@ -320,6 +320,8 @@ public class Spel implements KeyListener {
 			
 		} if(bounceRight) System.out.println(bounceRight); 	//Om te testen of bouncen Mario / Rechterrand goed gaat
 															//Zie hierboven
+		
+		if(bounceLeft) System.out.println(bounceLeft);
 	}
 	
 	public void updateStats(int p, int l, int a){
