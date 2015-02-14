@@ -19,12 +19,10 @@ public class Spel implements KeyListener {
 	ArrayList<Rand> randen;
 	ArrayList<Kogel> kogels;
 	ArrayList<Stat> stats;
-	int punten = 11;
-	int levens = 11;
-	int ammo = 11;
+	int punten = 0;
+	int levens = 3;
+	int ammo = 1;
 	BufferedImage image;
-	JLabel score;
-	JLabel ammunitie;
 	boolean running;
 	Achtergrond bg;
 	Enemy vijand;
@@ -66,11 +64,6 @@ public class Spel implements KeyListener {
 		
 		t = new Tekenaar(kogels, bg, enemies, mario, randen, stats);
 		t.setBounds(0, 0, 1000, 600);		
-		score = new JLabel("Score: " + punten);	//maak een nieuw JLabel object
-		t.add(score);				// en voeg deze aan je JPanel(Tekenaar) toe
-		
-		ammunitie = new JLabel("                                                                                                                        Ammo: " + ammo);
-		t.add(ammunitie);
 		scherm.add(t);
 		
 		
@@ -90,7 +83,6 @@ public class Spel implements KeyListener {
 			gebotst = controleerContact(mario, enemies);
 			if(gebotst){
 				enemies.remove(vijand);
-				score.setText("Score: " + punten);
 			}
 			mario.xOld = mario.x;
 			mario.yOld = mario.y;
@@ -200,7 +192,6 @@ public class Spel implements KeyListener {
 			if(ammo > 0 && !teller){
 				maakKogel();
 				ammo--;
-				ammunitie.setText("                                                                                                                        Ammo: " + ammo);
 				teller = true;
 			}
 		}
@@ -238,7 +229,16 @@ public class Spel implements KeyListener {
 				if(p instanceof KoopaTroopa) {
 					punten++;
 				} else {
-					punten--;
+					if(punten > 0){
+						punten--;
+					}
+					if(levens > 0){
+						levens--;
+					}
+					if(levens == 0){
+						//GameOver();
+					}
+
 				}
 				return true;
 			}
@@ -253,7 +253,6 @@ public class Spel implements KeyListener {
 					kogels.remove(k);
 					enemies.remove(p);
 					punten++;
-					score.setText("Score: " + punten);
 					t.repaint();
 					return true;
 				}
@@ -292,7 +291,6 @@ public class Spel implements KeyListener {
 					a.platform = true;
 					break;
 				} 
-				a.y = a.yOld;
 			} else {
 				a.platform = false;
 			}
