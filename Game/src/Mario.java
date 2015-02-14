@@ -17,7 +17,7 @@ public class Mario {
 	
 	public void spring() {
 		this.spring = this.y;
-		this.vy = -1;
+		this.vy = -2;
 	}
 	
 	public void teken(Graphics2D tekenObject){

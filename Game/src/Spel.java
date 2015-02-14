@@ -36,6 +36,8 @@ public class Spel implements KeyListener {
 	int leven; //Save van het aantal dat levens nu op staat (stats) 
 	int amm;  //Save van het aantal dat ammo nu op staat (stats)
 	boolean changed;
+	boolean bounceLeft;
+	boolean bounceRight;
 
 	
 	public Spel(){
@@ -84,7 +86,7 @@ public class Spel implements KeyListener {
 			if(gebotst){
 				enemies.remove(vijand);
 			}
-			mario.xOld = mario.x;
+			
 			mario.yOld = mario.y;
 			
 			for(Enemy e : enemies) {
@@ -96,8 +98,8 @@ public class Spel implements KeyListener {
 			}
 			
 			mario.y += mario.vy;
-			//System.out.println(enemies.get(0).vx);
-			if(mario.y < mario.spring -25){
+			
+			if(mario.y < mario.spring -35){
 				mario.vy=1;
 			}
 			
@@ -107,7 +109,7 @@ public class Spel implements KeyListener {
 			}
 			
 			for(Kogel k : kogels){
-				k.x += k.vx;
+				k.x += k.vx + this.vx;
 				if(k.y < 0 || k.y > scherm.getHeight() || k.x < 0 || k.x > scherm.getWidth()){
 					deleteKogel = k;
 				}
@@ -173,10 +175,14 @@ public class Spel implements KeyListener {
 			running = false;
 		}
 		if(e.getKeyCode() == e.VK_RIGHT){
-			this.vx = -2;
+			if(!bounceLeft) {
+				this.vx = -2;
+			}
 		}
 		if(e.getKeyCode() == e.VK_LEFT){
-			this.vx = 2;
+			if(!bounceRight) {
+				this.vx = 2;
+			}
 		}
 		if(e.getKeyCode() == e.VK_DOWN){
 		}
@@ -218,7 +224,8 @@ public class Spel implements KeyListener {
 	}
 
 	public void maakKogel(){
-		kogels.add(new Kogel(laadPlaatje("kogel.png"), mario.x + mario.breedte, mario.y + 20, 32, 26, 3, 0));
+		image = laadPlaatje("kogel.png");
+		kogels.add(new Kogel(image, mario.x + mario.breedte, mario.y + 20, 32, 26, 3, 0));
 	}
 	
 	public boolean controleerContact(Mario a, ArrayList<Enemy> enemies) {
@@ -236,7 +243,7 @@ public class Spel implements KeyListener {
 						levens--;
 					}
 					if(levens == 0){
-						//GameOver();
+						gameOver();
 					}
 
 				}
@@ -285,17 +292,34 @@ public class Spel implements KeyListener {
 	}
 	
 	public void controleerMario(Mario a, ArrayList<Rand> rand){
+		a.platform = false;
+		this.bounceLeft = false;
+		this.bounceRight = false;
 		for(Rand p : rand) {
 			if(a.x + a.breedte >= p.x && a.x <= p.x + p.breedte && a.y + a.breedte + 30 >= p.y && a.y <= p.y + p.breedte) {
-				if(a.y + a.hoogte == p.y) {
+				if(a.y + a.hoogte == p.y || a.y == p.y + p.hoogte) {
 					a.platform = true;
-					break;
-				} 
-			} else {
-				a.platform = false;
+					a.y = a.yOld;
+				} else {
+					if (a.x + a.breedte == p.x){
+						this.bounceLeft = true;
+						vx = 0;
+					}
+					if(a.x == p.x + p.breedte) {
+						this.bounceRight = true;
+						vx = 0;
+						/**
+						 * 
+						 * Dit werkt niet op de een of andere manier, ik heb nu geen tijd het te fixen.
+						 * Botsen gaat goed als mario van links komt, maar niet als hij van rechts komt
+						 * 
+						 */
+					}
+				}
 			}
 			
-		}
+		} if(bounceRight) System.out.println(bounceRight); 	//Om te testen of bouncen Mario / Rechterrand goed gaat
+															//Zie hierboven
 	}
 	
 	public void updateStats(int p, int l, int a){
@@ -307,38 +331,54 @@ public class Spel implements KeyListener {
 		//Als de punten nog niet hoger dan 10 zijn dan hoeven er geen twee cijfers getekent te worden
 		if(p < 10){
 			plaatjes = Integer.toString(p) + ".png";
-			stats.add(new Stat(laadPlaatje(plaatjes), 50 ,20, 30, 30));
+			image = laadPlaatje(plaatjes);
+			stats.add(new Stat(image, 50 ,20, 30, 30));
 		}
 		//Nu moet er een cijfertje extra bij komen
 		if(p > 9){
 			plaatjes = Integer.toString(p-10) + ".png";
-			stats.add(new Stat(laadPlaatje("1.png"), 50 ,20, 30, 30));
-			stats.add(new Stat(laadPlaatje(plaatjes), 70 ,20, 30, 30));
+			image = laadPlaatje("1.png");
+			stats.add(new Stat(image, 50 ,20, 30, 30));
+			image = laadPlaatje(plaatjes);
+			stats.add(new Stat(image, 70 ,20, 30, 30));
 		}
 		if(l <10){
 			plaatjes = Integer.toString(l) + ".png";
-			stats.add(new Stat(laadPlaatje(plaatjes), 50 ,65, 30, 30));
+			image = laadPlaatje(plaatjes);
+			stats.add(new Stat(image, 50 ,65, 30, 30));
 		}
 		if(l > 9){
 			plaatjes = Integer.toString(l-10) + ".png";
-			stats.add(new Stat(laadPlaatje("1.png"), 50, 65, 30, 30));
+			image = laadPlaatje("1.png");
+			stats.add(new Stat(image, 50, 65, 30, 30));
+			image = laadPlaatje(plaatjes);
 			stats.add(new Stat(laadPlaatje(plaatjes), 70 ,65, 30, 30));
 		}
 		if(a <10){
 			plaatjes = Integer.toString(a) + ".png";
-			stats.add(new Stat(laadPlaatje(plaatjes), 50 ,110, 30, 30));
+			image = laadPlaatje(plaatjes);
+			stats.add(new Stat(image, 50 ,110, 30, 30));
 		}
 		if(a > 9){
 			plaatjes = Integer.toString(a-10) + ".png";
-			stats.add(new Stat(laadPlaatje("1.png"), 50, 110, 30, 30));
+			image = laadPlaatje("1.png");
+			stats.add(new Stat(image, 50, 110, 30, 30));
+			image = laadPlaatje(plaatjes);
 			stats.add(new Stat(laadPlaatje(plaatjes), 70 ,110, 30, 30));
 		}
 		//Tekent standaard de coin en stelt de coins gelijk aan punten (kijk while functie)
 		coin = punten;
 		leven = levens;
 		amm = ammo;
+		image = laadPlaatje("ammo.png");
 		stats.add(new Stat(laadPlaatje("ammo.png"), 20, 110, 30, 30));
-		stats.add(new Stat(laadPlaatje("levens.png"), 20, 65, 30,30));
-		stats.add(new Stat(laadPlaatje("coin.png"), 10,10, 50, 50));
+		image = laadPlaatje("levens.png");
+		stats.add(new Stat(image, 20, 65, 30,30));
+		image = laadPlaatje("coin.png");
+		stats.add(new Stat(image, 10,10, 50, 50));
+	}
+	
+	public void gameOver() {
+		running = false;
 	}
 }
