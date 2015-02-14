@@ -18,9 +18,10 @@ public class Spel implements KeyListener {
 	Tekenaar t;
 	ArrayList<Rand> randen;
 	ArrayList<Kogel> kogels;
-	ArrayList<Coin> coins;
+	ArrayList<Stat> stats;
 	int punten = 11;
-	int ammo = 5;
+	int levens = 11;
+	int ammo = 11;
 	BufferedImage image;
 	JLabel score;
 	JLabel ammunitie;
@@ -33,7 +34,9 @@ public class Spel implements KeyListener {
 	boolean teller;
 	Kogel deleteKogel;
 	String plaatjes; //Het converteren van een int naar plaatjes bij updateCoins()
-	int coin; //Save van het aantal dat coins nu op staat
+	int coin; //Save van het aantal dat coins nu op staat (stats)
+	int leven; //Save van het aantal dat levens nu op staat (stats) 
+	int amm;  //Save van het aantal dat ammo nu op staat (stats)
 	boolean changed;
 
 	
@@ -50,7 +53,7 @@ public class Spel implements KeyListener {
 		image = laadPlaatje("mysteryBox.jpg");
 		randen.add(new Rand(image, 1000, 500, 25, 25));
 		
-		coins = new ArrayList<Coin>();
+		stats = new ArrayList<Stat>();
 		
 		createMap();
 		
@@ -61,7 +64,7 @@ public class Spel implements KeyListener {
 		scherm.setBounds(0, 0, 1000, 600);
 		scherm.setLayout(null);
 		
-		t = new Tekenaar(kogels, bg, enemies, mario, randen, coins);
+		t = new Tekenaar(kogels, bg, enemies, mario, randen, stats);
 		t.setBounds(0, 0, 1000, 600);		
 		score = new JLabel("Score: " + punten);	//maak een nieuw JLabel object
 		t.add(score);				// en voeg deze aan je JPanel(Tekenaar) toe
@@ -102,7 +105,7 @@ public class Spel implements KeyListener {
 			
 			mario.y += mario.vy;
 			//System.out.println(enemies.get(0).vx);
-			if(mario.y < mario.spring -25) {
+			if(mario.y < mario.spring -25){
 				mario.vy=1;
 			}
 			
@@ -123,8 +126,8 @@ public class Spel implements KeyListener {
 			controleerEnemies(randen, enemies);
 			
 			//Checkt of de coins moeten worden geupdate
-			if(coin != punten){
-				updateCoins(punten);
+			if(coin != punten || leven != levens || amm != ammo){
+				updateStats(punten,levens,ammo);
 			}
 			
 			t.repaint();
@@ -297,25 +300,47 @@ public class Spel implements KeyListener {
 		}
 	}
 	
-	public void updateCoins(int p){
+	public void updateStats(int p, int l, int a){
 		//Checkt of de code min. 1x is gerunt en cleart dan pas de coins list (anders komt er een error)
-		if(changed != true){
-			coins.clear();
+		if(changed = true){
+			stats.clear();
 		}
-		changed = false;
+		changed = true;
 		//Als de punten nog niet hoger dan 10 zijn dan hoeven er geen twee cijfers getekent te worden
 		if(p < 10){
 			plaatjes = Integer.toString(p) + ".png";
-			coins.add(new Coin(laadPlaatje(plaatjes), 50 ,20, 30, 30));
+			stats.add(new Stat(laadPlaatje(plaatjes), 50 ,20, 30, 30));
 		}
 		//Nu moet er een cijfertje extra bij komen
 		if(p > 9){
 			plaatjes = Integer.toString(p-10) + ".png";
-			coins.add(new Coin(laadPlaatje("1.png"), 50 ,20, 30, 30));
-			coins.add(new Coin(laadPlaatje(plaatjes), 70 ,20, 30, 30));
+			stats.add(new Stat(laadPlaatje("1.png"), 50 ,20, 30, 30));
+			stats.add(new Stat(laadPlaatje(plaatjes), 70 ,20, 30, 30));
+		}
+		if(l <10){
+			plaatjes = Integer.toString(l) + ".png";
+			stats.add(new Stat(laadPlaatje(plaatjes), 50 ,65, 30, 30));
+		}
+		if(l > 9){
+			plaatjes = Integer.toString(l-10) + ".png";
+			stats.add(new Stat(laadPlaatje("1.png"), 50, 65, 30, 30));
+			stats.add(new Stat(laadPlaatje(plaatjes), 70 ,65, 30, 30));
+		}
+		if(a <10){
+			plaatjes = Integer.toString(a) + ".png";
+			stats.add(new Stat(laadPlaatje(plaatjes), 50 ,110, 30, 30));
+		}
+		if(a > 9){
+			plaatjes = Integer.toString(a-10) + ".png";
+			stats.add(new Stat(laadPlaatje("1.png"), 50, 110, 30, 30));
+			stats.add(new Stat(laadPlaatje(plaatjes), 70 ,110, 30, 30));
 		}
 		//Tekent standaard de coin en stelt de coins gelijk aan punten (kijk while functie)
 		coin = punten;
-		coins.add(new Coin(laadPlaatje("coin.png"), 10,10, 50, 50));
+		leven = levens;
+		amm = ammo;
+		stats.add(new Stat(laadPlaatje("ammo.png"), 20, 110, 30, 30));
+		stats.add(new Stat(laadPlaatje("levens.png"), 20, 65, 30,30));
+		stats.add(new Stat(laadPlaatje("coin.png"), 10,10, 50, 50));
 	}
 }
