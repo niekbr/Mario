@@ -1,7 +1,3 @@
-
-# Feedback
-Feedback kan gegeven worden via http://niekbrekelmans.esy.es/, een hiervoor ingerichte website, waar het commentaar verzameld wordt en naar ons gestuurd wordt.
-
 # Logboek
 Thomas W. & Niek B.
 
