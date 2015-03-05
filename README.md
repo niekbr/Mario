@@ -8,9 +8,15 @@ Thomas W. & Niek B.
 ## Planning
 - ~~Mario op juiste manier over ondergrond laten lopen en springen~~
 - Gemaakte vijanden passende eigenschappen geven
+- Class voor PowerUps maken
+
+## 5-3
+- Animaties voor Goomba
+- Animaties voor Mario (stilstaan én lopen, in totaal 6 pictures
+- **verkeerde plaatje bij eerste keer laden MARIO!!**
 
 ## 14-2
-**NOG TE DOEN**
+- controleerContact gefixed en coin bug gefixed (10 kon de updateCoins niet op het scherm zetten).
 
 ## 13-2
 - Springen kan nu niet meer in de lucht (alleen als je op de grond staat)
