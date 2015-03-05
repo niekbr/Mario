@@ -15,6 +15,9 @@ Thomas W. & Niek B.
 - Animaties voor Mario (stilstaan én lopen, in totaal 6 pictures
 - **verkeerde plaatje bij eerste keer laden MARIO!!**
 
+## 4-3
+- Verschil tussen links, rechts, boven, onder bij botsen!
+
 ## 14-2
 - controleerContact gefixed en coin bug gefixed (10 kon de updateCoins niet op het scherm zetten).
 
