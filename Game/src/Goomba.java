@@ -2,8 +2,9 @@ import java.awt.image.BufferedImage;
 
 public class Goomba extends Enemy {
 	
-	public Goomba(BufferedImage image, int xBegin, int yBegin, int b, int h) {
-		super(image, xBegin, yBegin, b, h, 2, 1);
+	public Goomba(BufferedImage image, int xBegin, int yBegin) {
+		
+		super(image, xBegin, yBegin, 25, 25, 2, 1);
 	}
 	
 

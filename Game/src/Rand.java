@@ -3,7 +3,7 @@ import java.awt.image.BufferedImage;
 
 public class Rand {
 	public BufferedImage img;		// Een plaatje van de Enemy (in child gedefineerd)
-	public int x,y, breedte, hoogte;	// De plaats en afmeting van de Enemy in px (in child gedefineerd)
+	public int x,y, breedte, hoogte, xOld;	// De plaats en afmeting van de Enemy in px (in child gedefineerd)
 	
 	public Rand(BufferedImage image, int xBegin, int yBegin,int b, int h){
 		this.img = image;

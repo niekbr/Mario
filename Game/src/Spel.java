@@ -21,7 +21,7 @@ public class Spel implements KeyListener {
 	ArrayList<Stat> stats;
 	int punten = 0;
 	int levens = 3;
-	int ammo = 1;
+	int ammo = 4;
 	BufferedImage image;
 	boolean running;
 	Achtergrond bg;
@@ -29,8 +29,13 @@ public class Spel implements KeyListener {
 	Mario mario;
 	boolean gebotst;
 	int vx; //Alle objecten moeten meebewegen! Mario en achtergrond bewegen niet als enige!
-	boolean teller;
+	boolean pressedUp;
+	boolean pressedSpace;
+	boolean pressedDown;
+	boolean pressedLeft;
+	boolean pressedRight;
 	Kogel deleteKogel;
+	Enemy deleteEnemy;
 	String plaatjes; //Het converteren van een int naar plaatjes bij updateCoins()
 	int coin; //Save van het aantal dat coins nu op staat (stats)
 	int leven; //Save van het aantal dat levens nu op staat (stats) 
@@ -38,10 +43,13 @@ public class Spel implements KeyListener {
 	boolean changed;
 	boolean bounceLeft;
 	boolean bounceRight;
+	int teller;
+	boolean gifSwitch;
+	boolean kogelLeft;
 
 	
 	public Spel(){
-		image = laadPlaatje("mario.gif");
+		image = laadPlaatje("kijktRechts.gif");
 		mario = new Mario(image, 500, 400, 30, 60);
 		
 		image = laadPlaatje("background.jpg");
@@ -58,7 +66,6 @@ public class Spel implements KeyListener {
 		createMap();
 		
 		kogels = new ArrayList<Kogel>();
-		image = laadPlaatje("kogel.png");
 		
 		JFrame scherm = new JFrame("Mario - Thomas & Niek");
 		scherm.setBounds(0, 0, 1000, 600);
@@ -91,6 +98,47 @@ public class Spel implements KeyListener {
 			
 			for(Enemy e : enemies) {
 				e.yOld = e.y;
+				
+				//goomba loop animatie (gif effect)
+				if(e instanceof Goomba) {
+					if(teller == 10) {
+						if(gifSwitch) {
+							image = laadPlaatje("goomba1.gif");	//Goomba 1						
+						} else {
+							image = laadPlaatje("goomba2.gif"); //Goomba 2
+						}
+						e.img=(image);
+					}
+				}
+			}
+			
+			//mario loop animatie (gif effect)
+			if(teller == 10) {
+				if(pressedLeft) {
+					if(gifSwitch) {
+						image = laadPlaatje("looptLinks1.gif"); //Mario links 1							
+					} else {
+						image = laadPlaatje("looptLinks2.gif"); //Mario links 2
+					}
+					
+				}
+				
+				if(pressedRight) {
+					if(gifSwitch) {
+						image = laadPlaatje("looptRechts1.gif"); //Mario rechts 1						
+					} else {
+						image = laadPlaatje("looptRechts2.gif"); //Mario rechts 2
+					}
+				}
+				
+				if(pressedRight || pressedLeft) {
+					mario.img= image;
+				}
+			}
+			
+			
+			for(Rand p : randen) {
+				p.xOld = p.x;
 			}
 			
 			for(Rand p : randen){
@@ -106,6 +154,10 @@ public class Spel implements KeyListener {
 			for(Enemy e : enemies) {
 				e.x += e.vx + this.vx;
 				e.y += e.vy;
+				if(e.y < 0 || e.y > scherm.getHeight()) {
+					this.enemies.remove(e);
+					System.out.println("enemy deleted");
+				}
 			}
 			
 			for(Kogel k : kogels){
@@ -114,6 +166,7 @@ public class Spel implements KeyListener {
 					deleteKogel = k;
 				}
 			}
+			
 			kogels.remove(deleteKogel);
 			controleerSchot(kogels, enemies, randen);
 			controleerMario(mario, randen);
@@ -125,6 +178,13 @@ public class Spel implements KeyListener {
 			}
 			
 			t.repaint();
+			
+			if(teller == 10) {
+				teller = 0;
+				gifSwitch = !gifSwitch;
+			}
+			
+			teller++;
 		}
 		scherm.dispose();
 		System.out.println("QUIT");
@@ -151,10 +211,10 @@ public class Spel implements KeyListener {
 	//Arguments: aantal van iedere enemy!
 	private void createEnemies(int goombas, int koopatroopas, int parakoopatroopas) {
 		//Goomba's
-		BufferedImage image = laadPlaatje("goomba.png");
+		BufferedImage image = laadPlaatje("goomba1.gif");
 		enemies = new ArrayList<Enemy>();
 		for(int i=0; i<goombas; i++) {
-			this.enemies.add(new Goomba(image, 50*i, 0, 25, 25));
+			this.enemies.add(new Goomba(image, 50*i, 0));
 		}
 		
 		//Koopa Troopa's
@@ -178,27 +238,32 @@ public class Spel implements KeyListener {
 			if(!bounceLeft) {
 				this.vx = -2;
 			}
+			pressedRight = true;
+			this.kogelLeft = false;
 		}
 		if(e.getKeyCode() == e.VK_LEFT){
 			if(!bounceRight) {
 				this.vx = 2;
 			}
+			pressedLeft = true;
+			this.kogelLeft = true;
 		}
 		if(e.getKeyCode() == e.VK_DOWN){
+			pressedDown = true;
 		}
 		if(e.getKeyCode() == e.VK_UP){ 
-			if(!teller) {
+			if(!pressedUp) {
 				if(mario.platform) {
 					mario.spring();
-					teller = true;
+					this.pressedUp = true;
 				}
 			}
 		}
 		if(e.getKeyCode() == e.VK_SPACE){
-			if(ammo > 0 && !teller){
+			if(ammo > 0 && !pressedSpace){
 				maakKogel();
 				ammo--;
-				teller = true;
+				this.pressedSpace = true;
 			}
 		}
 		
@@ -207,16 +272,25 @@ public class Spel implements KeyListener {
 	public void keyReleased(KeyEvent e) {
 		if(e.getKeyCode() == e.VK_RIGHT){
 			this.vx = 0;
+			pressedRight = false;
+			image = laadPlaatje("kijktRechts.gif");
+			mario.img = image;
 		}
 		if(e.getKeyCode() == e.VK_LEFT){
 			this.vx = 0;
+			pressedLeft = false;
+			image = laadPlaatje("kijktLinks.gif");
+			mario.img = image;
 		}
 		if(e.getKeyCode() == e.VK_UP){
 			mario.vy = 1;
-			teller = false;
+			pressedUp = false;
 		}
 		if(e.getKeyCode() == e.VK_SPACE) {
-			teller = false;
+			pressedSpace = false;
+		}
+		if(e.getKeyCode() == e.VK_DOWN) {
+			pressedDown = false;
 		}
 	}
 
@@ -224,8 +298,14 @@ public class Spel implements KeyListener {
 	}
 
 	public void maakKogel(){
-		image = laadPlaatje("kogel.png");
-		kogels.add(new Kogel(image, mario.x + mario.breedte, mario.y + 20, 32, 26, 3, 0));
+		
+		if(kogelLeft) {
+			image = laadPlaatje("kogelLinks.png");
+			kogels.add(new Kogel(image, mario.x - 32, mario.y + 20, 32, 26, -3, 0));
+		} else {
+			image = laadPlaatje("kogelRechts.png");
+			kogels.add(new Kogel(image, mario.x + mario.breedte, mario.y + 20, 32, 26, 3, 0));
+		}
 	}
 	
 	public boolean controleerContact(Mario a, ArrayList<Enemy> enemies) {
@@ -242,6 +322,7 @@ public class Spel implements KeyListener {
 					if(levens > 0){
 						levens--;
 					}
+					
 					if(levens == 0){
 						gameOver();
 					}
@@ -297,31 +378,24 @@ public class Spel implements KeyListener {
 		this.bounceRight = false;
 		for(Rand p : rand) {
 			if(a.x + a.breedte >= p.x && a.x <= p.x + p.breedte && a.y + a.breedte + 30 >= p.y && a.y <= p.y + p.breedte) {
-				if(a.y + a.hoogte == p.y || a.y == p.y + p.hoogte) {
+				
+				if(a.yOld + a.hoogte <= p.y) { //komt van boven?
 					a.platform = true;
-					a.y = a.yOld - 1;
-				} else {
-					if (a.x + a.breedte == p.x){
-						this.bounceLeft = true;
-						vx = 0;
-					}
-					if(a.x - 30 < p.x + p.breedte) {
-						this.bounceRight = true;
-						vx = 0;
-						/**
-						 * 
-						 * Dit werkt niet op de een of andere manier, ik heb nu geen tijd het te fixen.
-						 * Botsen gaat goed als mario van links komt, maar niet als hij van rechts komt
-						 * 
-						 */
-					}
+					a.y = a.yOld;
+				} else if(a.yOld >= p.y + p.hoogte) { //komt van onder?
+					a.platform = true;
+					a.y = a.yOld;
+				} else if(a.x + a.breedte <= p.xOld){ //komt van links?
+					this.bounceLeft = true;
+					vx = 0;
+					
+				} else if(a.x + 1 >= p.xOld + p.breedte) { //komt van rechts?
+					this.bounceRight = true;
+					vx = 0;
 				}
 			}
 			
-		} if(bounceRight) System.out.println(bounceRight); 	//Om te testen of bouncen Mario / Rechterrand goed gaat
-															//Zie hierboven
-		
-		if(bounceLeft) System.out.println(bounceLeft);
+		}
 	}
 	
 	public void updateStats(int p, int l, int a){
