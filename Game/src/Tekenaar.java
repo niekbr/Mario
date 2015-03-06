@@ -7,19 +7,21 @@ import javax.swing.JPanel;
 public class Tekenaar extends JPanel{
 	private ArrayList<Enemy> enemies;
 	private ArrayList<Rand> randen;
+	private ArrayList<PowerUp> powerups;
 	private ArrayList<Kogel> kogels;
 	private ArrayList<Stat> stats;
 	private Mario mario;
 	private Achtergrond bg;
 	
 	//Constructor voor Tekenaar: array van 'Peer' en 'Goomba' klasses
-	public Tekenaar(ArrayList<Kogel> kogels, Achtergrond bg, ArrayList<Enemy> enemies, Mario mario, ArrayList<Rand> randen, ArrayList<Stat> stats){
+	public Tekenaar(ArrayList<Kogel> kogels, Achtergrond bg, ArrayList<Enemy> enemies, Mario mario, ArrayList<Rand> randen, ArrayList<Stat> stats, ArrayList<PowerUp> power){
 		this.enemies = enemies;
 		this.mario = mario;
 		this.randen = randen;
 		this.bg = bg;
 		this.kogels = kogels;
 		this.stats = stats;
+		this.powerups = power;
 	}
 	
 	//this.s.teken
@@ -37,6 +39,11 @@ public class Tekenaar extends JPanel{
 		for(Kogel i:kogels){
 			i.teken(g2d);
 		}
+		
+		for(PowerUp i:powerups){
+			i.teken(g2d);
+		}
+		
 		for(Rand i:randen){
 			i.teken(g2d);
 		}

@@ -1,7 +1,6 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
-import javax.swing.JLabel;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,7 +8,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 //klasse: "Spel"
-public class Spel implements KeyListener {
+public class Spel<MysterBox> implements KeyListener {
 	/**
 	 * De attributen van de klasse
 	 */
@@ -19,6 +18,7 @@ public class Spel implements KeyListener {
 	ArrayList<Rand> randen;
 	ArrayList<Kogel> kogels;
 	ArrayList<Stat> stats;
+	ArrayList<PowerUp> powerups;
 	int punten = 0;
 	int levens = 3;
 	int ammo = 4;
@@ -36,6 +36,8 @@ public class Spel implements KeyListener {
 	boolean pressedRight;
 	Kogel deleteKogel;
 	Enemy deleteEnemy;
+	Rand deleteBox;
+	Rand addBox;
 	String plaatjes; //Het converteren van een int naar plaatjes bij updateCoins()
 	int coin; //Save van het aantal dat coins nu op staat (stats)
 	int leven; //Save van het aantal dat levens nu op staat (stats) 
@@ -58,10 +60,14 @@ public class Spel implements KeyListener {
 		createEnemies(3, 0, 0);
 		
 		randen = new ArrayList<Rand>();
-		image = laadPlaatje("mysteryBox.jpg");
+		image = laadPlaatje("grass.jpg");
 		randen.add(new Rand(image, 1000, 500, 25, 25));
 		
+		image = laadPlaatje("mysterybox.jpg");
+		randen.add(new MysteryBox(image, 300, 430, 25, 25));
+		
 		stats = new ArrayList<Stat>();
+		powerups = new ArrayList<PowerUp>();
 		
 		createMap();
 		
@@ -71,7 +77,7 @@ public class Spel implements KeyListener {
 		scherm.setBounds(0, 0, 1000, 600);
 		scherm.setLayout(null);
 		
-		t = new Tekenaar(kogels, bg, enemies, mario, randen, stats);
+		t = new Tekenaar(kogels, bg, enemies, mario, randen, stats, powerups);
 		t.setBounds(0, 0, 1000, 600);		
 		scherm.add(t);
 		
@@ -139,9 +145,10 @@ public class Spel implements KeyListener {
 			
 			for(Rand p : randen) {
 				p.xOld = p.x;
+				p.x += this.vx;
 			}
 			
-			for(Rand p : randen){
+			for(PowerUp p : powerups){
 				p.x += this.vx;
 			}
 			
@@ -155,10 +162,12 @@ public class Spel implements KeyListener {
 				e.x += e.vx + this.vx;
 				e.y += e.vy;
 				if(e.y < 0 || e.y > scherm.getHeight()) {
-					this.enemies.remove(e);
-					System.out.println("enemy deleted");
+					this.deleteEnemy = e;
 				}
 			}
+			
+			enemies.remove(deleteEnemy);
+			
 			
 			for(Kogel k : kogels){
 				k.x += k.vx + this.vx;
@@ -166,8 +175,8 @@ public class Spel implements KeyListener {
 					deleteKogel = k;
 				}
 			}
-			
 			kogels.remove(deleteKogel);
+			
 			controleerSchot(kogels, enemies, randen);
 			controleerMario(mario, randen);
 			controleerEnemies(randen, enemies);
@@ -178,7 +187,6 @@ public class Spel implements KeyListener {
 			}
 			
 			t.repaint();
-			
 			if(teller == 10) {
 				teller = 0;
 				gifSwitch = !gifSwitch;
@@ -385,6 +393,16 @@ public class Spel implements KeyListener {
 				} else if(a.yOld >= p.y + p.hoogte) { //komt van onder?
 					a.platform = true;
 					a.y = a.yOld;
+					
+					//als mario een mysterybox van onder raakt komt er een powerup uit
+					if(p instanceof MysteryBox) {
+						image = laadPlaatje("levelUp.jpg");
+						powerups.add(new PowerUp(image, p.xOld, p.y - 20, 20, 20, 2));
+						image = laadPlaatje("grass.jpg");
+						addBox = new Rand(image, p.x, p.y, p.breedte, p.hoogte);
+						
+						this.deleteBox = p;
+					}
 				} else if(a.x + a.breedte <= p.xOld){ //komt van links?
 					this.bounceLeft = true;
 					vx = 0;
@@ -396,6 +414,13 @@ public class Spel implements KeyListener {
 			}
 			
 		}
+		rand.remove(deleteBox);
+		//alleen als addBox niet leeg is!
+		if(addBox instanceof Rand) {
+			rand.add(addBox);
+			addBox = null;
+		}
+		
 	}
 	
 	public void updateStats(int p, int l, int a){
@@ -456,5 +481,9 @@ public class Spel implements KeyListener {
 	
 	public void gameOver() {
 		running = false;
+	}
+	
+	public void openBox(MysteryBox b) {
+		
 	}
 }
