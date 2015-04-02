@@ -8,7 +8,12 @@ Thomas W. & Niek B.
 ## Planning
 - ~~Mario op juiste manier over ondergrond laten lopen en springen~~
 - Gemaakte vijanden passende eigenschappen geven
-- Class voor PowerUps maken
+
+## 1-4/2-4
+- De bullet powerup gemaakt (krijg je alleen als mario groot is)
+- De kogel over de grond laten schieten ipv vanaf Mario's hoofd (anders kon je vijanden niet raken als je groot was)
+- Alléén als mario de bullet powerup heeft de ammo laten zien
+- Iedere powerup heeft een string met een naam, die bepaalt wat voor powerup het is (speciaal geval: powerup 'groot'; maakt mario één type groter dan hij eerst was), image van powerup past hier ook bij (als mario klein is, komt er een mushroom, als mario al groot is, komt de bullet image)
 
 ## 5-3
 - Animaties voor Goomba
