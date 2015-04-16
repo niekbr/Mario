@@ -6,8 +6,10 @@ Thomas W. & Niek B.
 	-Daarom is het plaatsen van comments nog niet rendabel
 
 ## Planning
-- ~~Mario op juiste manier over ondergrond laten lopen en springen~~
 - Gemaakte vijanden passende eigenschappen geven
+
+## 16-4
+- Functionele menu gemaakt
 
 ## 1-4/2-4
 - De bullet powerup gemaakt (krijg je alleen als mario groot is)
