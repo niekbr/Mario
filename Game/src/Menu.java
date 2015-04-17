@@ -18,6 +18,7 @@ public class Menu implements MouseListener, MouseMotionListener {
 	private Achtergrond bg;
 	private BufferedImage image;
 	private JFrame scherm;
+	private int vx = -1;
 	
 	public Menu() {
 		image = laadPlaatje("background.jpg");
@@ -57,6 +58,20 @@ public class Menu implements MouseListener, MouseMotionListener {
 		t.addMouseMotionListener(this);
 		
 		
+		while (true){
+			try{
+				Thread.sleep(20);
+			}
+			catch(InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			bg.x = bg.x + vx;
+			if(scherm.getWidth() >= (bg.breedte + bg.x) || bg.x > 0 ) { //Bewegende achtergrond omdraaien
+				vx = -vx;
+			}
+			scherm.repaint();
+		}
 	}
 
 	public void mouseDragged(MouseEvent e) {
