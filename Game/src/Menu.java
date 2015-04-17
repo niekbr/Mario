@@ -12,28 +12,40 @@ import javax.swing.JFrame;
 
 public class Menu implements MouseListener, MouseMotionListener {
 	
-	TekenaarMenu t;
-	private Spel spel;
-	ArrayList<Rand> randen;
-	Achtergrond bg;
-	BufferedImage image;
-	JFrame scherm;
-	Rand r;
+	private TekenaarMenu t;
+	private ArrayList<Rand> menuknoppen;
+	private ArrayList<Rand> randen;
+	private Achtergrond bg;
+	private BufferedImage image;
+	private JFrame scherm;
 	
 	public Menu() {
 		image = laadPlaatje("background.jpg");
 		bg = new Achtergrond(image, 0, 0, 1750, 750);
 		
+		menuknoppen = new ArrayList<Rand>();
 		randen = new ArrayList<Rand>();
-		image = laadPlaatje("peer.jpg");
-		randen.add(new Rand(image, 10, 10, 50, 50));
-		randen.add(new Rand(image, 60, 10, 50, 50));
 		
-		scherm = new JFrame("Mario - Thomas & Niek");
+		image = laadPlaatje("world1.png");
+		menuknoppen.add(new Rand(image, 430, 200, 140, 50));
+		
+		image = laadPlaatje("world2.png");
+		menuknoppen.add(new Rand(image, 430, 275, 140, 50));
+		
+		image = laadPlaatje("world3.png");
+		menuknoppen.add(new Rand(image, 430, 350, 140, 50));
+		
+		image = laadPlaatje("logo.gif");
+		randen.add(new Rand(image, 325, 25, 350, 138));
+		
+		image = laadPlaatje("copyright.png");
+		randen.add(new Rand(image, 335, 425, 330, 50));
+		
+		scherm = new JFrame("Mario (Menu) - Thomas & Niek");
 		scherm.setBounds(0, 0, 1000, 600);
 		scherm.setLayout(null);
 		
-		t = new TekenaarMenu(bg, randen);
+		t = new TekenaarMenu(bg, menuknoppen, randen);
 		t.setBounds(0, 0, 1000, 600);		
 		scherm.add(t);
 		
@@ -72,15 +84,14 @@ public class Menu implements MouseListener, MouseMotionListener {
 
 
 	public void mousePressed(MouseEvent e) {
-		for(Rand ap : randen) {
-			if( (e.getX() > ap.x) 
-					&& (e.getX() < ap.x + ap.breedte) 
-					&& (e.getY() > ap.y) 
-					&& (e.getY() < ap.y + ap.hoogte)
-				){
+		for(Rand ap : menuknoppen) {
+			if( (e.getX() > ap.x) && (e.getX() < ap.x + ap.breedte) && (e.getY() > ap.y) && (e.getY() < ap.y + ap.hoogte) ){
 					scherm.dispose();
-					if(ap == randen.get(0)) spel = new Spel(0);
-					if(ap == randen.get(1)) spel = new Spel(1);
+					
+					if(ap == menuknoppen.get(0)) new Spel(1); //Level 1
+					if(ap == menuknoppen.get(1)) new Spel(2); //Level 2
+					if(ap == menuknoppen.get(1)) new Spel(3); //Level 3
+					
 				}
 		}
 		

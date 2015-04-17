@@ -6,11 +6,13 @@ import javax.swing.JPanel;
 
 public class TekenaarMenu extends JPanel{
 	private ArrayList<Rand> randen;
+	private ArrayList<Rand> menuknoppen;
 	private Achtergrond bg;
 	
 	//Constructor voor Tekenaar: array van 'Peer' en 'Goomba' klasses
-	public TekenaarMenu(Achtergrond bg, ArrayList<Rand> randen){
+	public TekenaarMenu(Achtergrond bg, ArrayList<Rand> menuknoppen, ArrayList<Rand> randen){
 		this.randen = randen;
+		this.menuknoppen = menuknoppen;
 		this.bg = bg;
 	}
 	
@@ -22,6 +24,10 @@ public class TekenaarMenu extends JPanel{
 		bg.teken(g2d);
 		
 		for(Rand i:randen){
+			i.teken(g2d);
+		}
+		
+		for(Rand i:menuknoppen){
 			i.teken(g2d);
 		}
 	}

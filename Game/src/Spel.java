@@ -60,7 +60,7 @@ public class Spel implements KeyListener, Runnable  {
 	boolean bullet;
 
 	
-	public Spel(int ok){
+	public Spel(int level){
 		
 		image = laadPlaatje("kijktRechts.gif");
 		mario = new Mario(image, 500, 400, this.g);
@@ -77,7 +77,7 @@ public class Spel implements KeyListener, Runnable  {
 		stats = new ArrayList<Stat>();
 		powerups = new ArrayList<PowerUp>();
 		
-		createMap(ok);
+		createMap(level);
 		
 		kogels = new ArrayList<Kogel>();
 		
@@ -115,8 +115,8 @@ public class Spel implements KeyListener, Runnable  {
 		 return img;
 	}
 	
-	private void createMap(int ok){
-		if(ok == 0) {
+	private void createMap(int level){
+		if(level == 1) {
 			image = laadPlaatje("grass.jpg");
 			for(int i=0; i<30; i++) {
 				randen.add(new Rand(image, 50*i, 525, 50, 50));
