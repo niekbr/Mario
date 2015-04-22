@@ -7,12 +7,23 @@ Thomas W. & Niek B.
 
 ## Planning
 - Gemaakte vijanden passende eigenschappen geven
+ 
+## 22-4
+- Level (1) bouwen:
+	- enemies
+	- ondergrond
+	- buizen
+	- mysteryboxes
 
 ## 16-4
 - Functionele menu gemaakt
 
 ## 1-4/2-4
-- De bullet powerup gemaakt (krijg je alleen als mario groot is)
+- De bullet powerup gemaakt (krijg je alleen als mario in 'type' 3 zit)
+- de types zijn:
+	1. klein
+	2. groot
+	3. bullet (dus kunnen schieten
 - De kogel over de grond laten schieten ipv vanaf Mario's hoofd (anders kon je vijanden niet raken als je groot was)
 - Alléén als mario de bullet powerup heeft de ammo laten zien
 - Iedere powerup heeft een string met een naam, die bepaalt wat voor powerup het is (speciaal geval: powerup 'groot'; maakt mario één type groter dan hij eerst was), image van powerup past hier ook bij (als mario klein is, komt er een mushroom, als mario al groot is, komt de bullet image)
