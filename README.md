@@ -7,7 +7,9 @@ Thomas W. & Niek B.
 - Gemaakte vijanden passende eigenschappen geven
  
 ## 22-4
-- Level (1) bouwen:
+- Pauzeer spel met ESCAPE
+- Icoontje voor applicatie/JFrame
+- Level (1) bezig met bouwen:
 	- enemies
 	- ondergrond
 	- buizen
