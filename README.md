@@ -2,8 +2,6 @@
 Thomas W. & Niek B.
 
 - Thomas moet nog comments toevoegen op veel plekken in de code
-- Veel van de code is voor de opdrachten en zal bij het project aangepast of zelfs verwijderd worden!
-	-Daarom is het plaatsen van comments nog niet rendabel
 
 ## Planning
 - Gemaakte vijanden passende eigenschappen geven
