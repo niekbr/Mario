@@ -4,13 +4,14 @@ Thomas W. & Niek B.
 - Thomas moet nog comments toevoegen op veel plekken in de code
 
 ## Planning
-- Gemaakte vijanden passende eigenschappen geven
+- Comments (thomas)
+- Level 1 maken
  
 ## 22-4
 - Pauzeer spel met ESCAPE
 - Icoontje voor applicatie/JFrame
 - Level (1) bezig met bouwen:
-	- enemies
+	- enemies (Alle soorten)
 	- ondergrond
 	- buizen
 	- mysteryboxes
@@ -31,7 +32,7 @@ Thomas W. & Niek B.
 ## 5-3
 - Animaties voor Goomba
 - Animaties voor Mario (stilstaan én lopen, in totaal 6 pictures
-- **verkeerde plaatje bij eerste keer laden MARIO!!**
+- verkeerde plaatje bij eerste keer laden MARIO!! -> opgelost
 
 ## 4-3
 - Verschil tussen links, rechts, boven, onder bij botsen!
