@@ -13,7 +13,7 @@ Thomas W. & Niek B.
 - Nieuwe enemy: prikBloem
 - Level (1) een stuk verder gemaakt
 - GODMODE (Druk op: G)
--
+
 ## 22-4
 - Pauzeer spel met ESCAPE
 - Icoontje voor applicatie/JFrame
