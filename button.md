@@ -14,3 +14,5 @@ http://dabuttonfactory.com/
 ## Border
 - Size: 2
 - Hex: #c69103
+
+**Keep the rest of the settings default!**
