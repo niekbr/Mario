@@ -7,6 +7,13 @@ Thomas W. & Niek B.
 - Comments (thomas)
 - Level 1 maken
  
+## 13-5
+- Aparte textures als je de bullet power upt hebt
+- Coins spawnen nu in de map
+- Nieuwe enemy: prikBloem
+- Level (1) een stuk verder gemaakt
+- GODMODE (Druk op: G)
+-
 ## 22-4
 - Pauzeer spel met ESCAPE
 - Icoontje voor applicatie/JFrame
