@@ -23,11 +23,11 @@ public class TekenaarMenu extends JPanel{
 		
 		bg.teken(g2d);
 		
-		for(Rand i:randen){
+		for(Rand i:menuknoppen){
 			i.teken(g2d);
 		}
 		
-		for(Rand i:menuknoppen){
+		for(Rand i:randen){
 			i.teken(g2d);
 		}
 	}

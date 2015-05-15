@@ -1,3 +1,6 @@
+import java.awt.Cursor;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -10,7 +13,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 
-public class Menu implements MouseListener, MouseMotionListener {
+public class Menu implements MouseListener, MouseMotionListener, Runnable {
 	
 	private TekenaarMenu t;
 	private ArrayList<Rand> menuknoppen;
@@ -18,29 +21,38 @@ public class Menu implements MouseListener, MouseMotionListener {
 	private Achtergrond bg;
 	private BufferedImage image;
 	private JFrame scherm;
+	private Thread tr;
 	private int vx = -1;
+	private Rand mouse;
+	private Boolean gifSwitch;
+	private int teller;
 	
 	public Menu() {
-		image = laadPlaatje("background.jpg");
+		image = laadPlaatje("textures/background.jpg");
 		bg = new Achtergrond(image, 0, 0, 1750, 750);
 		
 		menuknoppen = new ArrayList<Rand>();
 		randen = new ArrayList<Rand>();
 		
-		image = laadPlaatje("world1.png");
+		image = laadPlaatje("textures/world1.png");
 		menuknoppen.add(new Rand(image, 430, 200, 140, 50));
 		
-		image = laadPlaatje("world2.png");
+		image = laadPlaatje("textures/world2.png");
 		menuknoppen.add(new Rand(image, 430, 275, 140, 50));
 		
-		image = laadPlaatje("world3.png");
+		image = laadPlaatje("textures/world3.png");
 		menuknoppen.add(new Rand(image, 430, 350, 140, 50));
 		
-		image = laadPlaatje("logo.gif");
+		image = laadPlaatje("textures/logo.gif");
 		randen.add(new Rand(image, 325, 25, 350, 138));
 		
-		image = laadPlaatje("copyright.png");
+		image = laadPlaatje("textures/copyright.png");
 		randen.add(new Rand(image, 335, 425, 330, 50));
+		
+		//nieuwe cursor
+		image = laadPlaatje("textures/goomba1.gif");
+		mouse = new Rand(image, 0, 0, 0, 0);
+		randen.add(mouse);
 		
 		scherm = new JFrame("Mario (Menu) - Thomas & Niek");
 		scherm.setBounds(0, 0, 1000, 600);
@@ -50,14 +62,26 @@ public class Menu implements MouseListener, MouseMotionListener {
 		t.setBounds(0, 0, 1000, 600);		
 		scherm.add(t);
 		
+		image = laadPlaatje("textures/groot.png");
+		scherm.setIconImage(image);
 		
 		scherm.setVisible(true);
 		scherm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		t.addMouseListener(this);
 		t.addMouseMotionListener(this);
+		gifSwitch = false;
 		
+		//Verwijder de cursor
+		BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+		Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
+		scherm.getContentPane().setCursor(blankCursor);
 		
+		tr = new Thread(this, "Thomas & Niek - Mario");
+		tr.start();
+	}
+	
+	public void run() {
 		while (true){
 			try{
 				Thread.sleep(20);
@@ -70,8 +94,22 @@ public class Menu implements MouseListener, MouseMotionListener {
 			if(scherm.getWidth() >= (bg.breedte + bg.x) || bg.x > 0 ) { //Bewegende achtergrond omdraaien
 				vx = -vx;
 			}
+			
+			if(teller == 10) {
+				if(gifSwitch) {
+					image = laadPlaatje("textures/goomba1.gif");	//Goomba 1						
+				} else {
+					image = laadPlaatje("textures/goomba2.gif"); //Goomba 2
+				}
+				gifSwitch = !gifSwitch;
+				teller = 0;
+				mouse.img = image;
+			}
+			
+			teller++;
 			scherm.repaint();
 		}
+		
 	}
 
 	public void mouseDragged(MouseEvent e) {
@@ -81,6 +119,9 @@ public class Menu implements MouseListener, MouseMotionListener {
 
 	public void mouseMoved(MouseEvent e) {
 		
+		//midden van het plaatje wordt de cursor
+		mouse.x = e.getX() - (mouse.breedte / 2);
+		mouse.y = e.getY() - (mouse.hoogte / 2 );
 	}
 
 
@@ -89,12 +130,14 @@ public class Menu implements MouseListener, MouseMotionListener {
 
 
 	public void mouseEntered(MouseEvent e) {
-		
+		mouse.breedte = 25;
+		mouse.hoogte = 25;
 	}
 
 
 	public void mouseExited(MouseEvent e) {
-		
+		mouse.breedte = 0;
+		mouse.hoogte = 0;
 	}
 
 
@@ -116,7 +159,7 @@ public class Menu implements MouseListener, MouseMotionListener {
 		
 	}
 	
-	public BufferedImage laadPlaatje(String fileName) {
+	private BufferedImage laadPlaatje(String fileName) {
 		 BufferedImage img = null;
 		 try{
 			 img = ImageIO.read(new File(fileName));
