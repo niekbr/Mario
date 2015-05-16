@@ -12,7 +12,7 @@ Thomas W. & Niek B.
 - Coins spawnen nu in de map
 - Nieuwe enemy: prikBloem
 - Level (1) een stuk verder gemaakt
-- GODMODE (Druk op: G)
+- WIZARD MODE (Druk op: G)
 
 ## 22-4
 - Pauzeer spel met ESCAPE
