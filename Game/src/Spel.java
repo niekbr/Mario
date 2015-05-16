@@ -235,7 +235,6 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 			if(!bounceRight) {
 				this.vx = 2;
 			}
-			System.out.println(bounceRight);
 			pressedLeft = true;
 			kogelLeft = true;
 		}
