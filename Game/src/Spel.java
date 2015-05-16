@@ -76,13 +76,17 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 		
 		randen = new ArrayList<Rand>();
 		menuKnoppen = new ArrayList<Rand>();
+		
+		enemies = new ArrayList<Enemy>();
 		kogels = new ArrayList<Kogel>();
 		
 		stats = new ArrayList<Stat>();
 		powerups = new ArrayList<PowerUp>();
 		
 		image = laadPlaatje("textures/wizardMode.jpg");
+		
 		wizard = new Rand(image, 0, 0, 0, 0);
+		mouse = new Rand(image, 0, 0, 0, 0);
 		
 		createMap(level);
 		
@@ -90,7 +94,7 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 		scherm.setBounds(0, 0, 1000, 600);
 		scherm.setLayout(null);
 		
-		t = new Tekenaar(kogels, bg, enemies, mario, randen, stats, powerups, menuKnoppen, wizard);
+		t = new Tekenaar(kogels, bg, enemies, mario, randen, stats, powerups, menuKnoppen, wizard, mouse);
 		t.setBounds(0, 0, 1000, 600);		
 		scherm.add(t);
 		
@@ -110,8 +114,6 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 		
 		//nieuwe cursor
         image = laadPlaatje("textures/goomba1.gif");
-        mouse = new Rand(image, 0, 0, 0, 0);
-        randen.add(mouse);
         
         //Verwijder de cursor
         image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -134,7 +136,6 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 	
 	private void createMap(int level){
 		if(level == 1) {
-enemies = new ArrayList<Enemy>();
 			
 			image = laadPlaatje("textures/level1/background1.jpg");
 			bg = new Achtergrond(image, 0, 0, 1500, 750);
@@ -212,9 +213,10 @@ enemies = new ArrayList<Enemy>();
 			randen.add(new Rand(image, 1972, 425, 40, 145));
 			randen.add(new Rand(image, 2012, 395, 40, 180));
 			
-			
-			
-			
+		} else if(level == 2 || level == 3) { //NIET GEMAAKT! enkel om te laten zien dat meerdere levels mogelijk zijn.
+			image = laadPlaatje("textures/underConstruction.jpg");
+			bg = new Achtergrond(image, 0, 0, 1000, 600);
+			wizardMode = true;
 		}
 	}
 
@@ -233,6 +235,7 @@ enemies = new ArrayList<Enemy>();
 			if(!bounceRight) {
 				this.vx = 2;
 			}
+			System.out.println(bounceRight);
 			pressedLeft = true;
 			kogelLeft = true;
 		}
@@ -302,14 +305,7 @@ enemies = new ArrayList<Enemy>();
 		}
 		
 		if(e.getKeyCode() == e.VK_G){
-			wizardMode = !wizardMode;
-			if(wizardMode) {
-				wizard.breedte = 1000;
-				wizard.hoogte = 600;
-			} else {
-				wizard.breedte = 0;
-				wizard.hoogte = 0;
-			}
+			wizardMode();
 		}
 	}
 
@@ -344,7 +340,7 @@ enemies = new ArrayList<Enemy>();
 							ammo = 0;
 						}
 					if (levens == 0){
-						gameOver();
+						gameOver(true);
 					}
 						
 					}
@@ -365,7 +361,7 @@ enemies = new ArrayList<Enemy>();
 						}
 						
 						if(levens == 0){
-							gameOver();
+							gameOver(true);
 						}
 					}
 					
@@ -567,10 +563,14 @@ enemies = new ArrayList<Enemy>();
 		stats.add(new Stat(image, 10,70, 50, 50));
 	}
 	
-	private void gameOver() {
+	private void gameOver(boolean a) { //Boolean true: open menu; boolean false: terminate program
 		running = false;
 		scherm.dispose();
-		new Menu();
+		if(a) {
+			new Menu();
+		} else {
+			System.exit(0);
+		}
 	}
 	
 	public void changeType(Mario m, boolean increase) {
@@ -616,8 +616,11 @@ enemies = new ArrayList<Enemy>();
             pauseKnop = new Rand(image, 288, 150, 424, 113);
             menuKnoppen.add(pauseKnop);
             
-            image = laadPlaatje("textures/peer.jpg");
-            menuKnoppen.add(new Rand(image, 450, 300, 50, 50));
+            image = laadPlaatje("textures/menu.png");
+            menuKnoppen.add(new Rand(image, 430, 300, 140, 50));
+            
+            image = laadPlaatje("textures/quit.png");
+            menuKnoppen.add(new Rand(image, 430, 375, 140, 50));
             
         } else {
             menuKnoppen.clear();
@@ -627,6 +630,17 @@ enemies = new ArrayList<Enemy>();
         
         running = !running;
     }
+	
+	private void wizardMode() {
+		wizardMode = !wizardMode;
+		if(wizardMode) {
+			wizard.breedte = 1000;
+			wizard.hoogte = 600;
+		} else {
+			wizard.breedte = 0;
+			wizard.hoogte = 0;
+		}
+	}
 
 	public void run() {
 		while (true){
@@ -775,7 +789,7 @@ enemies = new ArrayList<Enemy>();
 				}
 				
 				if(mario.y < 0 || mario.y > scherm.getHeight() || mario.x < 0 || mario.x > scherm.getWidth()){
-					gameOver();
+					gameOver(true);
 				}
 				kogels.remove(deleteKogel);
 				
@@ -832,9 +846,11 @@ enemies = new ArrayList<Enemy>();
 		for(Rand ap : menuKnoppen) {
 			if( (e.getX() > ap.x) && (e.getX() < ap.x + ap.breedte) && (e.getY() > ap.y) && (e.getY() < ap.y + ap.hoogte) ){
 				//menuKnoppen[0] is het logo, dus [1] is de eerste knop
-				System.out.println(menuKnoppen.size());
 				if(ap == menuKnoppen.get(1)) { //Knop 1 (Terug naar menu)
-					gameOver();
+					gameOver(true);
+				}
+				if(ap == menuKnoppen.get(2)) { //Knop 2 (Quit)
+					gameOver(false);
 				}
 			}
 		}

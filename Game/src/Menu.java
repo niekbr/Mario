@@ -35,16 +35,19 @@ public class Menu implements MouseListener, MouseMotionListener, Runnable {
 		randen = new ArrayList<Rand>();
 		
 		image = laadPlaatje("textures/world1.png");
-		menuknoppen.add(new Rand(image, 430, 200, 140, 50));
+		menuknoppen.add(new Rand(image, 430, 190, 140, 50));
 		
 		image = laadPlaatje("textures/world2.png");
-		menuknoppen.add(new Rand(image, 430, 275, 140, 50));
+		menuknoppen.add(new Rand(image, 430, 250, 140, 50));
 		
 		image = laadPlaatje("textures/world3.png");
-		menuknoppen.add(new Rand(image, 430, 350, 140, 50));
+		menuknoppen.add(new Rand(image, 430, 310, 140, 50));
+		
+		image = laadPlaatje("textures/quit.png");
+		menuknoppen.add(new Rand(image, 430, 370, 140, 50));
 		
 		image = laadPlaatje("textures/logo.gif");
-		randen.add(new Rand(image, 325, 25, 350, 138));
+		randen.add(new Rand(image, 325, 25, 340, 138));
 		
 		image = laadPlaatje("textures/copyright.png");
 		randen.add(new Rand(image, 335, 425, 330, 50));
@@ -148,7 +151,11 @@ public class Menu implements MouseListener, MouseMotionListener, Runnable {
 					
 					if(ap == menuknoppen.get(0)) new Spel(1); //Level 1
 					if(ap == menuknoppen.get(1)) new Spel(2); //Level 2
-					if(ap == menuknoppen.get(1)) new Spel(3); //Level 3
+					if(ap == menuknoppen.get(2)) new Spel(3); //Level 3
+					if(ap == menuknoppen.get(3)) {
+						scherm.dispose();
+						System.exit(0);
+					}
 					
 				}
 		}
