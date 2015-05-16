@@ -10,6 +10,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.Line;
 import javax.swing.JFrame;
 
 
@@ -26,8 +30,13 @@ public class Menu implements MouseListener, MouseMotionListener, Runnable {
 	private Rand mouse;
 	private Boolean gifSwitch;
 	private int teller;
+	private Clip clip;
 	
-	public Menu() {
+	public Menu(boolean firstTime) {
+		if(firstTime) {
+			playMusic("main");
+		}
+		
 		image = laadPlaatje("textures/background.jpg");
 		bg = new Achtergrond(image, 0, 0, 1750, 750);
 		
@@ -175,5 +184,26 @@ public class Menu implements MouseListener, MouseMotionListener, Runnable {
 		 }
 		 return img;
 	}
+	
+	public void playMusic(String file) {
+		try {
+			clip = (Clip)AudioSystem.getLine(new Line.Info(Clip.class));
+	        clip.open(AudioSystem.getAudioInputStream(new File("sounds/"+file+".wav")));
+	        
+	        if(file == "main") {
+	        	FloatControl gainControl = 
+	        		    (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+	        		gainControl.setValue(-20.0f); // Muziek moet niet boven soundeffects uitkomen, dus 20dB zachter
+	        }
+	        
+	        clip.start();
+	        if(file == "main") { //muziek moet niet stoppen
+	        	clip.loop(Clip.LOOP_CONTINUOUSLY);
+	        }
+	    }
+	    catch (Exception exc) {
+	        exc.printStackTrace(System.out);
+	    }
+      }
 
 }

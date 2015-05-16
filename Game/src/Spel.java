@@ -13,7 +13,9 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.sound.sampled.*;
 
+ 
 //klasse: "Spel"
 public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionListener  {
 	/**
@@ -22,7 +24,7 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 	Tekenaar t;
 	JFrame scherm;
 	Thread tr;
-	
+	Clip clip;
 	ArrayList<Enemy> enemies;
 	ArrayList<Rand> randen;
 	ArrayList<Rand> menuKnoppen;
@@ -69,6 +71,8 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 
 	
 	public Spel(int level){
+		
+		//playMusic("main");
 		
 		image = laadPlaatje("textures/kijktRechts.gif");
 		mario = new Mario(image, 500, 400, this.g);
@@ -219,6 +223,17 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 			wizardMode = true;
 		}
 	}
+	
+	public void playMusic(String file) {
+		try {
+			clip = (Clip)AudioSystem.getLine(new Line.Info(Clip.class));
+	        clip.open(AudioSystem.getAudioInputStream(new File("sounds/"+file+".wav")));
+	        clip.start();
+	    }
+	    catch (Exception exc) {
+	        exc.printStackTrace(System.out);
+	    }
+      }
 
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == e.VK_ESCAPE){
@@ -245,6 +260,7 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 		if(e.getKeyCode() == e.VK_UP){ 
 			if(!pressedUp) {
 				if(mario.platform) {
+					playMusic("jump");
 					mario.spring();
 				}
 			}
@@ -330,6 +346,7 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 					punten++;
 				} else if(p instanceof coinPickup){
 					punten++;
+					playMusic("coin");
 				} else if (p instanceof prikkelBloem) {
 					if (levens > 0){
 						if(a.type == 0) {
@@ -431,15 +448,13 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 				
 				if(e.powerUp == "lifeUp") {
 					levens++;
+					playMusic("1-up");
 					
 				}
 				
 				if(e.powerUp == "groot") {
 					changeType(mario, true);
-				}
-				
-				if(a.type != 2 && e.powerUp == "bullet") {
-					changeType(mario, true);
+					playMusic("powerUp-pick");
 				}
 			}
 		}
@@ -565,8 +580,9 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 	private void gameOver(boolean a) { //Boolean true: open menu; boolean false: terminate program
 		running = false;
 		scherm.dispose();
+		
 		if(a) {
-			new Menu();
+			new Menu(false);
 		} else {
 			System.exit(0);
 		}
