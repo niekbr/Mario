@@ -224,7 +224,7 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 		}
 	}
 	
-	public void playMusic(String file) {
+	public void playSound(String file) {
 		try {
 			clip = (Clip)AudioSystem.getLine(new Line.Info(Clip.class));
 	        clip.open(AudioSystem.getAudioInputStream(new File("sounds/"+file+".wav")));
@@ -260,7 +260,7 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 		if(e.getKeyCode() == e.VK_UP){ 
 			if(!pressedUp) {
 				if(mario.platform) {
-					playMusic("jump");
+					playSound("jump");
 					mario.spring();
 				}
 			}
@@ -346,7 +346,7 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 					punten++;
 				} else if(p instanceof coinPickup){
 					punten++;
-					playMusic("coin");
+					playSound("coin");
 				} else if (p instanceof prikkelBloem) {
 					if (levens > 0){
 						if(a.type == 0) {
@@ -448,13 +448,13 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 				
 				if(e.powerUp == "lifeUp") {
 					levens++;
-					playMusic("1-up");
+					playSound("1-up");
 					
 				}
 				
 				if(e.powerUp == "groot") {
 					changeType(mario, true);
-					playMusic("powerUp-pick");
+					playSound("powerUp-pick");
 				}
 			}
 		}
@@ -480,6 +480,7 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 					
 					//als mario een mysterybox van onder raakt komt er een powerup uit
 					if(p instanceof MysteryBox) {
+						playSound("powerUp-appear");
 						this.deleteBox = (MysteryBox) p;
 						powerUp = deleteBox.powerUp;
 						if(powerUp == "groot") {

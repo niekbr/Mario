@@ -34,7 +34,7 @@ public class Menu implements MouseListener, MouseMotionListener, Runnable {
 	
 	public Menu(boolean firstTime) {
 		if(firstTime) {
-			playMusic("main");
+			playMainMusic();
 		}
 		
 		image = laadPlaatje("textures/background.jpg");
@@ -185,21 +185,16 @@ public class Menu implements MouseListener, MouseMotionListener, Runnable {
 		 return img;
 	}
 	
-	public void playMusic(String file) {
+	public void playMainMusic() {
 		try {
 			clip = (Clip)AudioSystem.getLine(new Line.Info(Clip.class));
-	        clip.open(AudioSystem.getAudioInputStream(new File("sounds/"+file+".wav")));
+	        clip.open(AudioSystem.getAudioInputStream(new File("sounds/main.wav")));
 	        
-	        if(file == "main") {
-	        	FloatControl gainControl = 
-	        		    (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-	        		gainControl.setValue(-20.0f); // Muziek moet niet boven soundeffects uitkomen, dus 20dB zachter
-	        }
+	        FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+	        gainControl.setValue(-20.0f); // Muziek moet niet boven soundeffects uitkomen, dus 20dB zachter
 	        
 	        clip.start();
-	        if(file == "main") { //muziek moet niet stoppen
-	        	clip.loop(Clip.LOOP_CONTINUOUSLY);
-	        }
+	        clip.loop(Clip.LOOP_CONTINUOUSLY);
 	    }
 	    catch (Exception exc) {
 	        exc.printStackTrace(System.out);
