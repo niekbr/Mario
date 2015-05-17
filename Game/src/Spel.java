@@ -15,7 +15,14 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.sound.sampled.*;
 
- 
+/**
+* 
+* @author Thomas Wagenaar & Niek Brekelmans
+* @param levelnummer, Clip muziek (voor stop/play), instellingen over sound en music
+* @since 04-02-2015
+* @version 2.0
+*/
+
 //klasse: "Spel"
 public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionListener  {
 	/**
@@ -24,7 +31,8 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 	Tekenaar t;
 	JFrame scherm;
 	Thread tr;
-	Clip clip;
+	Clip sound;
+	Clip music;
 	ArrayList<Enemy> enemies;
 	ArrayList<Rand> randen;
 	ArrayList<Rand> menuKnoppen;
@@ -50,6 +58,7 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 	Kogel deleteKogel;
 	Enemy deleteEnemy;
 	MysteryBox deleteBox;
+	ParaKoopaTroopa PKT;
 	
 	Rand addBox;
 	Rand mouse;
@@ -59,6 +68,7 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 	int coin; //Save van het aantal dat coins nu op staat (stats)
 	int leven; //Save van het aantal dat levens nu op staat (stats) 
 	int amm;  //Save van het aantal dat ammo nu op staat (stats)
+	long timeIdle;
 	boolean changed;
 	boolean bounceLeft;
 	boolean bounceRight;
@@ -66,20 +76,47 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 	boolean gifSwitch;
 	boolean kogelLeft;
 	boolean bullet;
-	boolean wizardMode = false;
+	boolean wizardMode;
+	boolean musicOn;
+	boolean soundOn;
 	Rand wizard;
 
 	
-	public Spel(int level){
+	public Spel(int level, Clip music, boolean musicOn, boolean soundOn){
+		this.musicOn = musicOn;
+		this.soundOn = soundOn;
+		this.music = music;
 		
-		//playMusic("main");
-		
-		image = laadPlaatje("textures/kijktRechts.gif");
+		image = laadPlaatje("kijktRechts.gif");
 		mario = new Mario(image, 500, 400, this.g);
 		changeType(mario, true);
 		
 		randen = new ArrayList<Rand>();
+		
 		menuKnoppen = new ArrayList<Rand>();
+		
+		image = laadPlaatje("pause.png");
+        menuKnoppen.add(new Rand(image, 288, 150, 0, 0));
+        
+        image = laadPlaatje("menu.png");
+        menuKnoppen.add(new Rand(image, 430, 300, 0, 0));
+        
+        image = laadPlaatje("quit.png");
+        menuKnoppen.add(new Rand(image, 430, 375, 0, 0));
+        
+        if(musicOn) {
+        	image = laadPlaatje("musicOn.png");
+        } else {
+        	image = laadPlaatje("musicOff.png");
+        }
+        menuKnoppen.add(new Rand(image, 950, 10, 25, 25));
+        
+        if(soundOn) {
+        	image = laadPlaatje("soundOn.png");
+        } else {
+        	image = laadPlaatje("soundOff.png");
+        }
+        menuKnoppen.add(new Rand(image, 920, 10, 25, 25));
 		
 		enemies = new ArrayList<Enemy>();
 		kogels = new ArrayList<Kogel>();
@@ -87,7 +124,7 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 		stats = new ArrayList<Stat>();
 		powerups = new ArrayList<PowerUp>();
 		
-		image = laadPlaatje("textures/wizardMode.jpg");
+		image = laadPlaatje("wizardMode.jpg");
 		
 		wizard = new Rand(image, 0, 0, 0, 0);
 		mouse = new Rand(image, 0, 0, 0, 0);
@@ -102,7 +139,7 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 		t.setBounds(0, 0, 1000, 600);		
 		scherm.add(t);
 		
-		image = laadPlaatje("textures/groot.png");
+		image = laadPlaatje("groot.png");
 		scherm.setIconImage(image);
 		scherm.setVisible(true);
 		scherm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -117,7 +154,7 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 		changed = false;
 		
 		//nieuwe cursor
-        image = laadPlaatje("textures/goomba1.gif");
+        image = laadPlaatje("goomba1.gif");
         
         //Verwijder de cursor
         image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -127,11 +164,11 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 		tr = new Thread(this, "Thomas & Niek - Mario");
 		tr.start();
 	}
-	
+
 	public BufferedImage laadPlaatje(String fileName) {
 		 BufferedImage img = null;
 		 try{
-			 img = ImageIO.read(new File(fileName));
+			 img = ImageIO.read(new File("textures/" + fileName));
 		 } catch(IOException e){
 			 System.out.println("Er is iets fout gegaan bij het laden van het plaatje " + fileName + ".");
 		 }
@@ -141,103 +178,102 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 	private void createMap(int level){
 		if(level == 1) {
 			
-			image = laadPlaatje("textures/level1/background1.jpg");
+			image = laadPlaatje("level1/background1.jpg");
 			bg = new Achtergrond(image, 0, 0, 1500, 750);
 
-			image = laadPlaatje("textures/level1/ground.png");
+			image = laadPlaatje("level1/ground.png");
 			for(int i=0; i<17; i++) {
 				randen.add(new Rand(image, 30*i, 540, 32, 32));	
 			}
 			
-			
-			
 			// Eerste buizen
-			image = laadPlaatje("textures/buis.jpg");
+			image = laadPlaatje("buis.jpg");
 			randen.add(new Rand(image, 512, 490, 40, 90));
 			randen.add(new Rand(image, 612, 455, 40, 110));
 			randen.add(new Rand(image, 712, 425, 40, 145));
 			randen.add(new Rand(image, 812, 395, 40, 180));
 			
 			//Het muntje na de laatste buiz
-			image = laadPlaatje("textures/coin.png");
+			image = laadPlaatje("coin.png");
 			enemies.add(new coinPickup(image, 892, 295));
 
 			// De vijf blokjes na de eerste vier buizen
-			image = laadPlaatje("textures/level1/ground.png");
+			image = laadPlaatje("level1/ground.png");
 			for(int i=0; i<5; i++) {
 				randen.add(new Rand(image, 912 + 30*i, 445, 32, 32));	
 			}
 				
 			//Blokje tussen middelste en rechtse buis
-			image = laadPlaatje("textures/mysterybox.jpg");
+			image = laadPlaatje("mysterybox.jpg");
 			randen.add(new MysteryBox(image, 975, 350, 25, 25, "groot"));
 			
 			//Sprink blokje om over obstakel te komen
-			image = laadPlaatje("textures/level1/ground.png");
+			image = laadPlaatje("level1/ground.png");
 			randen.add(new Rand(image, 1122, 425, 32, 32));
 			
 			//Obstakel van buizen
-			image = laadPlaatje("textures/buis.jpg");
+			image = laadPlaatje("buis.jpg");
 			randen.add(new Rand(image, 1232, 385, 40, 180));
 			randen.add(new Rand(image, 1272, 415, 40, 180));
 			randen.add(new Rand(image, 1212, 445, 40, 180));
 			randen.add(new Rand(image, 1252, 480, 40, 90));
 			
 			//Het muntje op een van de buizen in het obstakel
-			image = laadPlaatje("textures/coin.png");
+			image = laadPlaatje("coin.png");
 			enemies.add(new coinPickup(image, 1205, 419));
 			
 			//Blokjes na de buizen
-			image = laadPlaatje("textures/level1/ground.png");
+			image = laadPlaatje("level1/ground.png");
 			for(int i=0; i<20; i++) {
 				randen.add(new Rand(image, 1292 + 30*i, 540, 32, 32));	
 			}
 			
 			//Blokje waar je de bullet powerup van krjigt
-			image = laadPlaatje("textures/mysterybox.jpg");
+			image = laadPlaatje("mysterybox.jpg");
 			randen.add(new MysteryBox(image, 1442, 450, 25, 25, "groot"));
 			
 			// De vijand die op de blijk blokjes spawnt
-			image = laadPlaatje("textures/prikkelBloem.png");
+			image = laadPlaatje("prikkelBloem.png");
 			enemies.add(new prikkelBloem(image, 1597, 465, 30, 70));
 			
 			//Buis waar prikkelbloem uit komt
-			image = laadPlaatje("textures/buis.jpg");
+			image = laadPlaatje("buis.jpg");
 			randen.add(new Rand(image, 1592, 515, 40, 55));
 			
 			//Spawn de goomba's in dat gebiedje
-			image = laadPlaatje("textures/goomba1.gif");
+			image = laadPlaatje("goomba1.gif");
 			enemies.add(new Goomba(image, 1597, 405));
-			enemies.add(new Goomba(image, 1697, 405));
+			enemies.add(new ParaKoopaTroopa(image, 1697, 350, 25, 25, 400, 300));
 			
 			//Buis aan de rechterkant van het gebiedje waar de Goomba's lopen
-			image = laadPlaatje("textures/buis.jpg");
+			image = laadPlaatje("buis.jpg");
 			randen.add(new Rand(image, 1892, 490, 40, 90));
 			randen.add(new Rand(image, 1932, 455, 40, 110));
 			randen.add(new Rand(image, 1972, 425, 40, 145));
 			randen.add(new Rand(image, 2012, 395, 40, 180));
 			
 		} else if(level == 2 || level == 3) { //NIET GEMAAKT! enkel om te laten zien dat meerdere levels mogelijk zijn.
-			image = laadPlaatje("textures/underConstruction.jpg");
+			image = laadPlaatje("underConstruction.jpg");
 			bg = new Achtergrond(image, 0, 0, 1000, 600);
 			wizardMode = true;
 		}
 	}
 	
 	public void playSound(String file) {
-		try {
-			clip = (Clip)AudioSystem.getLine(new Line.Info(Clip.class));
-	        clip.open(AudioSystem.getAudioInputStream(new File("sounds/"+file+".wav")));
-	        clip.start();
-	    }
-	    catch (Exception exc) {
-	        exc.printStackTrace(System.out);
-	    }
-      }
+		if(soundOn) {
+			try {
+				sound = (Clip)AudioSystem.getLine(new Line.Info(Clip.class));
+		        sound.open(AudioSystem.getAudioInputStream(new File("sounds/"+file+".wav")));
+		        sound.start();
+		    } catch (Exception e) {
+		        e.printStackTrace(System.out);
+		    }
+		}
+	}
 
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == e.VK_ESCAPE){
-			pause(running);
+			pause();
 		}
 		if(e.getKeyCode() == e.VK_RIGHT){
 			if(!bounceLeft) {
@@ -290,9 +326,9 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 			this.vx = 0;
 			pressedRight = false;
 			if(!bullet) {
-				image = laadPlaatje("textures/kijktRechts.gif"); //niet bullet
+				image = laadPlaatje("kijktRechts.gif"); //niet bullet
 			} else {
-				image = laadPlaatje("textures/bulletKijktRechts.gif"); //wel bullet
+				image = laadPlaatje("bulletKijktRechts.gif"); //wel bullet
 			}
 			mario.img = image;
 		}
@@ -301,9 +337,9 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 			pressedLeft = false;
 			
 			if(!bullet) {
-				image = laadPlaatje("textures/kijktLinks.gif"); //niet bullet
+				image = laadPlaatje("kijktLinks.gif"); //niet bullet
 			} else {
-				image = laadPlaatje("textures/bulletKijktLinks.gif"); //wel bullet
+				image = laadPlaatje("bulletKijktLinks.gif"); //wel bullet
 			}
 			
 			mario.img = image;
@@ -329,10 +365,10 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 
 	public void maakKogel(){
 		if(kogelLeft) {
-			image = laadPlaatje("textures/kogelLinks.png");
+			image = laadPlaatje("kogelLinks.png");
 			kogels.add(new Kogel(image, mario.x - 32, mario.y + mario.hoogte - 35, 32, 26, -3, 0));
 		} else {
-			image = laadPlaatje("textures/kogelRechts.png");
+			image = laadPlaatje("kogelRechts.png");
 			kogels.add(new Kogel(image, mario.x + mario.breedte, mario.y + mario.hoogte - 35, 32, 26, 3, 0));
 		}
 	}
@@ -493,10 +529,10 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 							}
 						}
 						
-						image = laadPlaatje("textures/" + powerUp + ".png");
+						image = laadPlaatje("" + powerUp + ".png");
 						powerups.add(new PowerUp(image, p.xOld, p.y - 20, 20, 20, 1, this.g, deleteBox.powerUp));
 						
-						image = laadPlaatje("textures/emptyBlock.png"); //Box wordt leeg
+						image = laadPlaatje("emptyBlock.png"); //Box wordt leeg
 						addBox = new Rand(image, p.x, p.y, p.breedte, p.hoogte);
 					}
 					
@@ -527,41 +563,41 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 		//Als de punten nog niet hoger dan 10 zijn dan hoeven er geen twee cijfers getekent te worden
 		if(p < 10){
 			plaatjes = Integer.toString(p) + ".png";
-			image = laadPlaatje("textures/" + plaatjes);
+			image = laadPlaatje("" + plaatjes);
 			stats.add(new Stat(image, 50 ,80, 30, 30));
 		}
 		//Nu moet er een cijfertje extra bij komen
 		if(p > 9){
 			plaatjes = Integer.toString(p-10) + ".png";
-			image = laadPlaatje("textures/1.png");
+			image = laadPlaatje("1.png");
 			stats.add(new Stat(image, 50 ,80, 30, 30));
-			image = laadPlaatje("textures/" + plaatjes);
+			image = laadPlaatje("" + plaatjes);
 			stats.add(new Stat(image, 70 ,80, 30, 30));
 		}
 		if(l < 10){
 			plaatjes = Integer.toString(l) + ".png";
-			image = laadPlaatje("textures/" + plaatjes);
+			image = laadPlaatje("" + plaatjes);
 			stats.add(new Stat(image, 50 ,125, 30, 30));
 		}
 		if(l > 9){
 			plaatjes = Integer.toString(l-10) + ".png";
-			image = laadPlaatje("textures/1.png");
+			image = laadPlaatje("1.png");
 			stats.add(new Stat(image, 50, 125, 30, 30));
-			image = laadPlaatje("textures/" + plaatjes);
-			stats.add(new Stat(laadPlaatje("textures/" + plaatjes), 700 ,125, 30, 30));
+			image = laadPlaatje("" + plaatjes);
+			stats.add(new Stat(laadPlaatje("" + plaatjes), 700 ,125, 30, 30));
 		}
 		if(bullet) {
 			if(a < 10){
 				plaatjes = Integer.toString(a) + ".png";
-				image = laadPlaatje("textures/" + plaatjes);
+				image = laadPlaatje("" + plaatjes);
 				stats.add(new Stat(image, 50 ,170, 30, 30));
 			}
 			if(a > 9){
 				plaatjes = Integer.toString(a-10) + ".png";
 				image = laadPlaatje("1.png");
 				stats.add(new Stat(image, 50, 170, 30, 30));
-				image = laadPlaatje("textures/" + plaatjes);
-				stats.add(new Stat(laadPlaatje("textures/" + plaatjes), 700 ,170, 30, 30));
+				image = laadPlaatje("" + plaatjes);
+				stats.add(new Stat(laadPlaatje("" + plaatjes), 700 ,170, 30, 30));
 			}
 		}
 		//Tekent standaard de coin en stelt de coins gelijk aan punten (kijk while functie)
@@ -569,12 +605,12 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 		leven = levens;
 		amm = ammo;
 		if(bullet) {
-			image = laadPlaatje("textures/ammo.png");
-			stats.add(new Stat(laadPlaatje("textures/ammo.png"), 20, 170, 30, 30));
+			image = laadPlaatje("ammo.png");
+			stats.add(new Stat(laadPlaatje("ammo.png"), 20, 170, 30, 30));
 		}
-		image = laadPlaatje("textures/levens.png");
+		image = laadPlaatje("levens.png");
 		stats.add(new Stat(image, 20, 125, 30,30));
-		image = laadPlaatje("textures/coin.png");
+		image = laadPlaatje("coin.png");
 		stats.add(new Stat(image, 10,70, 50, 50));
 	}
 	
@@ -623,25 +659,23 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 		}
 	}
 	
-	private void pause(boolean paused) {
-        if(paused) {
-            mouse.breedte = 25;
-            mouse.hoogte = 25;
+	private void pause() {
+        if(running) {
             
-            image = laadPlaatje("textures/pause.png");
-            pauseKnop = new Rand(image, 288, 150, 424, 113);
-            menuKnoppen.add(pauseKnop);
+            menuKnoppen.get(0).breedte = 424;
+            menuKnoppen.get(0).hoogte = 113;
             
-            image = laadPlaatje("textures/menu.png");
-            menuKnoppen.add(new Rand(image, 430, 300, 140, 50));
+            menuKnoppen.get(1).breedte = 140;
+            menuKnoppen.get(1).hoogte = 50;
             
-            image = laadPlaatje("textures/quit.png");
-            menuKnoppen.add(new Rand(image, 430, 375, 140, 50));
+            menuKnoppen.get(2).breedte = 140;
+            menuKnoppen.get(2).hoogte = 50;
             
         } else {
-            menuKnoppen.clear();
-            mouse.breedte = 0;
-            mouse.hoogte = 0;
+        	for(int i = 0; i < 3; i++) {
+            	menuKnoppen.get(i).breedte = 0;
+            	menuKnoppen.get(i).hoogte = 0;
+            }
         }
         
         running = !running;
@@ -656,6 +690,31 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 			wizard.breedte = 0;
 			wizard.hoogte = 0;
 		}
+	}
+	
+	private void music() {
+		musicOn = !musicOn;
+		if(musicOn) {
+			music.start();
+			music.loop(Clip.LOOP_CONTINUOUSLY);
+			image = laadPlaatje("musicOn.png");
+			
+		} else {
+			music.stop();
+			image = laadPlaatje("musicOff.png");
+		}
+		
+		menuKnoppen.get(3).img = image;
+	}
+	
+	private void sound() {
+		soundOn = !soundOn;
+		if(soundOn) {
+			image = laadPlaatje("soundOn.png");
+		} else {
+			image = laadPlaatje("soundOff.png");
+		}
+		menuKnoppen.get(4).img = image;
 	}
 
 	public void run() {
@@ -677,26 +736,26 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 				
 				mario.yOld = mario.y;
 				
+				//muis loop animatie (gif effect)
+                if(teller == 10) {
+                    if(gifSwitch) {
+                        image = laadPlaatje("goomba1.gif");   //Goomba 1                      
+                    } else {
+                        image = laadPlaatje("goomba2.gif"); //Goomba 2
+                    }
+                    mouse.img = image;
+                }
+                
 				for(Enemy e : enemies) {
 					e.yOld = e.y;
-					
-					//muis loop animatie (gif effect)
-	                if(teller == 10) {
-	                    if(gifSwitch) {
-	                        image = laadPlaatje("textures/goomba1.gif");   //Goomba 1                      
-	                    } else {
-	                        image = laadPlaatje("textures/goomba2.gif"); //Goomba 2
-	                    }
-	                    mouse.img = image;
-	                }
 	                
 					//goomba loop animatie (gif effect)
 					if(e instanceof Goomba) {
 						if(teller == 10 || teller == 20) {
 							if(gifSwitch) {
-								image = laadPlaatje("textures/goomba1.gif");	//Goomba 1						
+								image = laadPlaatje("goomba1.gif");	//Goomba 1						
 							} else {
-								image = laadPlaatje("textures/goomba2.gif"); //Goomba 2
+								image = laadPlaatje("goomba2.gif"); //Goomba 2
 							}
 							e.img = image;
 						}
@@ -707,18 +766,18 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 					if(teller == 10 || teller == 20) {
 						if(pressedLeft) {
 							if(gifSwitch) {
-								image = laadPlaatje("textures/looptLinks1.gif"); //Mario links 1							
+								image = laadPlaatje("looptLinks1.gif"); //Mario links 1							
 							} else {
-								image = laadPlaatje("textures/looptLinks2.gif"); //Mario links 2
+								image = laadPlaatje("looptLinks2.gif"); //Mario links 2
 							}
 							
 						}
 						
 						if(pressedRight) {
 							if(gifSwitch) {
-								image = laadPlaatje("textures/looptRechts1.gif"); //Mario rechts 1						
+								image = laadPlaatje("looptRechts1.gif"); //Mario rechts 1						
 							} else {
-								image = laadPlaatje("textures/looptRechts2.gif"); //Mario rechts 2
+								image = laadPlaatje("looptRechts2.gif"); //Mario rechts 2
 							}
 						}
 						
@@ -730,18 +789,18 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 					if(teller == 10 || teller == 20) {
 						if(pressedLeft) {
 							if(gifSwitch) {
-								image = laadPlaatje("textures/bulletLooptLinks1.gif"); //Mario links 1							
+								image = laadPlaatje("bulletLooptLinks1.gif"); //Mario links 1							
 							} else {
-								image = laadPlaatje("textures/bulletLooptLinks2.gif"); //Mario links 2
+								image = laadPlaatje("bulletLooptLinks2.gif"); //Mario links 2
 							}
 							
 						}
 						
 						if(pressedRight) {
 							if(gifSwitch) {
-								image = laadPlaatje("textures/bulletLooptRechts1.gif"); //Mario rechts 1						
+								image = laadPlaatje("bulletLooptRechts1.gif"); //Mario rechts 1						
 							} else {
-								image = laadPlaatje("textures/bulletLooptRechts2.gif"); //Mario rechts 2
+								image = laadPlaatje("bulletLooptRechts2.gif"); //Mario rechts 2
 							}
 						}
 						
@@ -792,6 +851,14 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 					if(e.y < 0 || e.y > scherm.getHeight()) {
 						deleteEnemy = e;
 					}
+					
+					if(e instanceof ParaKoopaTroopa) {
+						PKT = (ParaKoopaTroopa) e;
+						
+						if(PKT.y <= PKT.hoog || PKT.y >= PKT.laag) {
+							PKT.vy = -PKT.vy;
+						}
+					}
 				}
 				
 				enemies.remove(deleteEnemy);
@@ -819,17 +886,26 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 					updateStats(punten,levens,ammo);
 				}
 				
+			}
+			
+			if(System.currentTimeMillis() - timeIdle > 1500) {
+	            mouse.breedte = 0;
+	            mouse.hoogte = 0;
 			} else {
-                //muis loop animatie (gif effect)
-                if(teller == 20) {
-                    if(gifSwitch) {
-                        image = laadPlaatje("textures/goomba1.gif");   //Goomba 1                      
-                    } else {
-                        image = laadPlaatje("textures/goomba2.gif"); //Goomba 2
-                    }
-                    mouse.img = image;
+	            mouse.breedte = 25;
+	            mouse.hoogte = 25;
+			}
+			
+            //muis loop animatie (gif effect)
+            if(teller == 20) {
+                if(gifSwitch) {
+                    image = laadPlaatje("goomba1.gif");   //Goomba 1                      
+                } else {
+                    image = laadPlaatje("goomba2.gif"); //Goomba 2
                 }
+                mouse.img = image;
             }
+            
 			
 			if(teller++ == 20) {
 				teller = 0;
@@ -864,9 +940,12 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 				//menuKnoppen[0] is het logo, dus [1] is de eerste knop
 				if(ap == menuKnoppen.get(1)) { //Knop 1 (Terug naar menu)
 					gameOver(true);
-				}
-				if(ap == menuKnoppen.get(2)) { //Knop 2 (Quit)
+				} else if(ap == menuKnoppen.get(2)) { //Knop 2 (Quit)
 					gameOver(false);
+				} else if(ap == menuKnoppen.get(3)) { //Knop 3 (Muziek aan/uit)
+					music();
+				} else if(ap == menuKnoppen.get(4)) { //Knop 4 (Sound aan/uit)
+					sound();
 				}
 			}
 		}
@@ -885,6 +964,7 @@ public class Spel implements KeyListener, Runnable, MouseListener, MouseMotionLi
 		//midden van het plaatje wordt de cursor
         mouse.x = e.getX() - (mouse.breedte / 2);
         mouse.y = e.getY() - (mouse.hoogte / 2 );
-		
+        timeIdle = System.currentTimeMillis();
+        
 	}
 }

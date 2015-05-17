@@ -20,7 +20,7 @@ import javax.swing.JFrame;
 public class Menu implements MouseListener, MouseMotionListener, Runnable {
 	
 	private TekenaarMenu t;
-	private ArrayList<Rand> menuknoppen;
+	private ArrayList<Rand> menuKnoppen;
 	private ArrayList<Rand> randen;
 	private Achtergrond bg;
 	private BufferedImage image;
@@ -31,38 +31,46 @@ public class Menu implements MouseListener, MouseMotionListener, Runnable {
 	private Boolean gifSwitch;
 	private int teller;
 	private Clip clip;
+	private boolean musicOn = true;
+	private boolean soundOn = true;
 	
 	public Menu(boolean firstTime) {
 		if(firstTime) {
 			playMainMusic();
 		}
 		
-		image = laadPlaatje("textures/background.jpg");
+		image = laadPlaatje("background.jpg");
 		bg = new Achtergrond(image, 0, 0, 1750, 750);
 		
-		menuknoppen = new ArrayList<Rand>();
+		menuKnoppen = new ArrayList<Rand>();
 		randen = new ArrayList<Rand>();
 		
-		image = laadPlaatje("textures/world1.png");
-		menuknoppen.add(new Rand(image, 430, 190, 140, 50));
+		image = laadPlaatje("world1.png");
+		menuKnoppen.add(new Rand(image, 430, 190, 140, 50));
 		
-		image = laadPlaatje("textures/world2.png");
-		menuknoppen.add(new Rand(image, 430, 250, 140, 50));
+		image = laadPlaatje("world2.png");
+		menuKnoppen.add(new Rand(image, 430, 250, 140, 50));
 		
-		image = laadPlaatje("textures/world3.png");
-		menuknoppen.add(new Rand(image, 430, 310, 140, 50));
+		image = laadPlaatje("world3.png");
+		menuKnoppen.add(new Rand(image, 430, 310, 140, 50));
 		
-		image = laadPlaatje("textures/quit.png");
-		menuknoppen.add(new Rand(image, 430, 370, 140, 50));
+		image = laadPlaatje("quit.png");
+		menuKnoppen.add(new Rand(image, 430, 370, 140, 50));
 		
-		image = laadPlaatje("textures/logo.gif");
+		image = laadPlaatje("musicOn.png");
+		menuKnoppen.add(new Rand(image, 950, 10, 25, 25));
+		
+		image = laadPlaatje("soundOn.png");
+		menuKnoppen.add(new Rand(image, 920, 10, 25, 25));
+		
+		image = laadPlaatje("logo.gif");
 		randen.add(new Rand(image, 325, 25, 340, 138));
 		
-		image = laadPlaatje("textures/copyright.png");
+		image = laadPlaatje("copyright.png");
 		randen.add(new Rand(image, 335, 425, 330, 50));
 		
 		//nieuwe cursor
-		image = laadPlaatje("textures/goomba1.gif");
+		image = laadPlaatje("goomba1.gif");
 		mouse = new Rand(image, 0, 0, 0, 0);
 		randen.add(mouse);
 		
@@ -70,11 +78,11 @@ public class Menu implements MouseListener, MouseMotionListener, Runnable {
 		scherm.setBounds(0, 0, 1000, 600);
 		scherm.setLayout(null);
 		
-		t = new TekenaarMenu(bg, menuknoppen, randen);
+		t = new TekenaarMenu(bg, menuKnoppen, randen);
 		t.setBounds(0, 0, 1000, 600);		
 		scherm.add(t);
 		
-		image = laadPlaatje("textures/groot.png");
+		image = laadPlaatje("groot.png");
 		scherm.setIconImage(image);
 		
 		scherm.setVisible(true);
@@ -109,9 +117,9 @@ public class Menu implements MouseListener, MouseMotionListener, Runnable {
 			
 			if(teller == 10) {
 				if(gifSwitch) {
-					image = laadPlaatje("textures/goomba1.gif");	//Goomba 1						
+					image = laadPlaatje("goomba1.gif");	//Goomba 1						
 				} else {
-					image = laadPlaatje("textures/goomba2.gif"); //Goomba 2
+					image = laadPlaatje("goomba2.gif"); //Goomba 2
 				}
 				gifSwitch = !gifSwitch;
 				teller = 0;
@@ -154,17 +162,17 @@ public class Menu implements MouseListener, MouseMotionListener, Runnable {
 
 
 	public void mousePressed(MouseEvent e) {
-		for(Rand ap : menuknoppen) {
+		for(Rand ap : menuKnoppen) {
 			if( (e.getX() > ap.x) && (e.getX() < ap.x + ap.breedte) && (e.getY() > ap.y) && (e.getY() < ap.y + ap.hoogte) ){
-					scherm.dispose();
+					if(ap != menuKnoppen.get(4) && ap != menuKnoppen.get(5)) scherm.dispose();
 					
-					if(ap == menuknoppen.get(0)) new Spel(1); //Level 1
-					if(ap == menuknoppen.get(1)) new Spel(2); //Level 2
-					if(ap == menuknoppen.get(2)) new Spel(3); //Level 3
-					if(ap == menuknoppen.get(3)) {
-						scherm.dispose();
-						System.exit(0);
-					}
+					if(ap == menuKnoppen.get(0)) new Spel(1, clip, musicOn, soundOn); //Level 1
+					if(ap == menuKnoppen.get(1)) new Spel(2, clip, musicOn, soundOn); //Level 2
+					if(ap == menuKnoppen.get(2)) new Spel(3, clip, musicOn, soundOn); //Level 3
+					if(ap == menuKnoppen.get(3)) System.exit(0); //Quit
+					if(ap == menuKnoppen.get(4)) music();
+					if(ap == menuKnoppen.get(5)) sound();
+					
 					
 				}
 		}
@@ -178,7 +186,7 @@ public class Menu implements MouseListener, MouseMotionListener, Runnable {
 	private BufferedImage laadPlaatje(String fileName) {
 		 BufferedImage img = null;
 		 try{
-			 img = ImageIO.read(new File(fileName));
+			 img = ImageIO.read(new File("textures/" + fileName));
 		 } catch(IOException e){
 			 System.out.println("Er is iets fout gegaan bij het laden van het plaatje " + fileName + ".");
 		 }
@@ -200,5 +208,30 @@ public class Menu implements MouseListener, MouseMotionListener, Runnable {
 	        exc.printStackTrace(System.out);
 	    }
       }
+	
+	private void music() {
+		musicOn = !musicOn;
+		if(musicOn) {
+			clip.start();
+			clip.loop(Clip.LOOP_CONTINUOUSLY);
+			image = laadPlaatje("musicOn.png");
+			
+		} else {
+			clip.stop();
+			image = laadPlaatje("musicOff.png");
+		}
+		
+		menuKnoppen.get(4).img = image;
+	}
+	
+	private void sound() {
+		soundOn = !soundOn;
+		if(soundOn) {
+			image = laadPlaatje("soundOn.png");
+		} else {
+			image = laadPlaatje("soundOff.png");
+		}
+		menuKnoppen.get(5).img = image;
+	}
 
 }
